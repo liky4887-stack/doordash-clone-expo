@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     ...shadows.md,
     elevation: 4,
-    marginRight: space.md,
+    marginRight: space.sm,
     minWidth: 160,
   },
   content: {
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral[100],
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: space.md,
+    marginBottom: space.sm,
   },
   emoji: {
     fontSize: 32,

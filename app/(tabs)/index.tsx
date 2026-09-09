@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, FlatList, Platform } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, FlatList, Platform, Image } from 'react-native';
 import Animated, { FadeInDown, FadeInUp, SlideInRight, SlideOutLeft, withTiming, useSharedValue, useAnimatedStyle, interpolateColor } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -135,7 +135,7 @@ export default function HomeScreen() {
               />
             )}
             keyExtractor={(item) => item.id}
-            ItemSeparatorComponent={() => <View style={{ width: space.md }} />}
+            ItemSeparatorComponent={() => <View style={{ width: space.sm }} />}
           />
         </Animated.View>
 
@@ -156,6 +156,17 @@ export default function HomeScreen() {
             {stores.slice(0, 2).map((store) => (
               <StoreCard key={`easter-${store.id}`} store={store} />
             ))}
+          </View>
+        </Animated.View>
+
+        {/* Bottom Banner - Full-width footer banner above tab bar */}
+        <Animated.View entering={FadeInUp.delay(600).springify()} style={styles.bottomBanner}>
+          <View style={styles.bannerContent}>
+            <Text style={styles.bannerTitle}>Get 5% off pickup orders</Text>
+            <Text style={styles.bannerSubtitle}>DashPass members save more every day</Text>
+            <TouchableOpacity style={styles.bannerButton}>
+              <Text style={styles.bannerButtonText}>Learn More</Text>
+            </TouchableOpacity>
           </View>
         </Animated.View>
       </ScrollView>
@@ -227,7 +238,7 @@ const styles = StyleSheet.create({
     lineHeight: typography.lineHeight.normal,
   },
   section: {
-    paddingTop: space.md,
+    paddingTop: space.xs,
     paddingBottom: space.sm,
   },
   sectionTitle: {
@@ -239,6 +250,43 @@ const styles = StyleSheet.create({
   },
   storesList: {
     paddingHorizontal: space.lg,
+  },
+  bottomBanner: {
+    marginHorizontal: space.lg,
+    marginBottom: space.lg,
+    borderRadius: borderRadius.xl,
+    overflow: 'hidden',
+    backgroundColor: colors.primary[500],
+    ...shadows.lg,
+  },
+  bannerContent: {
+    padding: space.lg,
+    alignItems: 'center',
+  },
+  bannerTitle: {
+    fontSize: typography.fontSize.xl,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.background.inverse,
+    textAlign: 'center',
+    marginBottom: space.xs,
+  },
+  bannerSubtitle: {
+    fontSize: typography.fontSize.sm,
+    color: colors.background.inverse,
+    opacity: 0.9,
+    textAlign: 'center',
+    marginBottom: space.md,
+  },
+  bannerButton: {
+    backgroundColor: colors.background.primary,
+    paddingHorizontal: space.xl,
+    paddingVertical: space.sm,
+    borderRadius: borderRadius.pill,
+  },
+  bannerButtonText: {
+    color: colors.primary[500],
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.bold,
   },
 });
 

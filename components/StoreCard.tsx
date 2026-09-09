@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral[100],
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: space.lg,
+    marginBottom: space.sm,
   },
   emoji: {
     fontSize: 40,
