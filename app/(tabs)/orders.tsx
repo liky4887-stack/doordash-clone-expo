@@ -1,90 +1,75 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+/**
+ * Orders Screen - Premium order tracking screen
+ * Features: Design tokens integration, smooth animations, touchable feedback
+ */
+
+import { useState } from 'react';
+import { StyleSheet, Text, View, ScrollView, FlatList, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, {
+  FadeInUp,
+} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Spacing, Radius } from '@/constants/colors';
-import { addOns, healthItems, HealthItem } from '@/constants/mockData';
+import colors from "@/src/design-tokens/colors";
+import typography from "@/src/design-tokens/typography";
+import { shadows } from "@/src/design-tokens/shadows";
+import { ourPicks } from '@/constants/mockData';
 
 export default function OrdersScreen() {
-  const renderHealthItem = ({ item }: { item: HealthItem }) => (
-    <View style={styles.healthItem}>
-      <Text style={styles.healthEmoji}>{item.emoji}</Text>
-      <Text style={styles.healthName} numberOfLines={1}>{item.name}</Text>
-    </View>
-  );
+  const [orders, setOrders] = useState([
+    {
+      id: '1',
+      restaurant: 'Burger Place',
+      status: 'Preparing',
+      time: '30 min',
+      deliveryFee: '$3.50',
+    },
+    {
+      id: '2',
+      restaurant: 'Sushi Bar',
+      status: 'On the way',
+      time: '15 min',
+      deliveryFee: '$2.50',
+    },
+  ]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Confirming order</Text>
-          <Text style={styles.headerSubtitle}>Arriving by 9:45 PM</Text>
-        </View>
+        <Animated.View entering={FadeInUp.duration(300).springify()}>
+          <Text style={styles.headerTitle}>Order History</Text>
+          <Text style={styles.headerSubtitle}>Your recent orders</Text>
+        </Animated.View>
 
-        <View style={styles.content}>
-          <View style={styles.deliveryCard}>
-            <View style={styles.deliveryLeft}>
-              <View style={styles.statusIcon}>
-                <Ionicons name="restaurant-outline" size={24} color={Colors.WHITE} />
+        <Animated.View style={styles.ordersListSection} entering={FadeInUp.delay(100).springify()}>
+          {orders.map((order, index) => (
+            <TouchableOpacity
+              key={order.id}
+              style={styles.orderCard}
+              accessibilityRole="button"
+              accessibilityLabel={order.restaurant + ' order'}
+            >
+              <View style={styles.orderHeader}>
+                <Text style={styles.restaurantName}>{order.restaurant}</Text>
+                <Text style={styles.statusBadge}>{order.status}</Text>
               </View>
-              <View style={styles.deliveryInfo}>
-                <Text style={styles.deliveryTitle}>Tony Pizza Napoletana</Text>
-                <Text style={styles.deliveryMeta}>1 item · $18.50</Text>
+
+              <View style={styles.orderDetails}>
+                <Text style={styles.deliveryTime}>{order.time}</Text>
+                <Text style={styles.deliveryFee}>Delivery: {order.deliveryFee}</Text>
               </View>
-            </View>
-            <TouchableOpacity style={styles.trackBtn} activeOpacity={0.7}>
-              <Text style={styles.trackBtnText}>Track</Text>
             </TouchableOpacity>
-          </View>
+          ))}
+        </Animated.View>
 
-          <View style={styles.windowCard}>
-            <Text style={styles.windowLabel}>Delivery Window</Text>
-            <Text style={styles.windowTime}>9:30 - 9:45 PM</Text>
-            <Text style={styles.windowMeta}>Standard delivery · Free with DashPass</Text>
-          </View>
-
-          <View style={styles.doubleDashCard}>
-            <View style={styles.doubleDashHeader}>
-              <View style={styles.doubleDashIcon}>
-                <Ionicons name="layers-outline" size={18} color={Colors.PRIMARY} />
-              </View>
-              <Text style={styles.doubleDashTitle}>DoubleDash</Text>
-            </View>
-            <Text style={styles.doubleDashTimer}>9:56 mins left</Text>
-            <Text style={styles.doubleDashSubtitle}>
-              Add items from another store and get them delivered together
-            </Text>
-          </View>
-
-          <View style={styles.addOnsSection}>
-            <Text style={styles.sectionTitle}>Add to your order</Text>
-            {addOns.map((addon) => (
-              <View key={addon.id} style={styles.addOnRow}>
-                <View style={styles.addOnLeft}>
-                  <Text style={styles.addOnEmoji}>{addon.emoji}</Text>
-                  <View>
-                    <Text style={styles.addOnName}>{addon.name}</Text>
-                    <Text style={styles.addOnMeta}>{addon.extraTime} · {addon.price}</Text>
-                  </View>
-                </View>
-                <TouchableOpacity style={styles.addBtn} activeOpacity={0.7}>
-                  <Text style={styles.addBtnText}>Add</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-
-          <View style={styles.healthSection}>
-            <Text style={styles.sectionTitle}>Health & Wellness</Text>
-            <FlatList
-              data={healthItems}
-              renderItem={renderHealthItem}
-              keyExtractor={(item) => item.id}
-              numColumns={3}
-              scrollEnabled={false}
-              contentContainerStyle={styles.healthGrid}
-            />
-          </View>
-        </View>
+        {/* Empty state */}
+        <Animated.View entering={FadeInUp.delay(200).springify()} style={styles.emptyState}>
+          <Ionicons name="list-outline" size={64} color={colors.neutral[300]} />
+          <Text style={styles.emptyTitle}>No orders yet</Text>
+          <Text style={styles.emptySubtitle}>
+            Start ordering to see your order history here
+          </Text>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -93,211 +78,86 @@ export default function OrdersScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: Colors.WHITE,
+    backgroundColor: colors.background.primary,
   },
   container: {
     flex: 1,
   },
-  header: {
-    paddingHorizontal: Spacing.LG,
-    paddingVertical: Spacing.MD,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.LIGHT_GRAY,
-  },
   headerTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: Colors.BLACK,
+    fontSize: typography.fontSize['2xl'],
+    fontWeight: typography.fontWeight.bold,
+    color: colors.neutral[900],
+    paddingHorizontal: space.lg,
+    paddingTop: space.md,
   },
   headerSubtitle: {
-    fontSize: 14,
-    color: Colors.DARK_GRAY,
-    marginTop: 2,
+    fontSize: typography.fontSize.base,
+    color: colors.neutral[500],
+    paddingHorizontal: space.lg,
+    paddingBottom: space.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
   },
-  content: {
-    paddingHorizontal: Spacing.LG,
-    paddingTop: Spacing.MD,
+  ordersListSection: {
+    paddingHorizontal: space.lg,
+    paddingBottom: space.lg,
   },
-  deliveryCard: {
+  orderCard: {
+    backgroundColor: colors.background.primary,
+    borderRadius: borderRadius.lg,
+    padding: space.lg,
+    marginBottom: space.lg,
+    ...shadows.sm,
+  },
+  orderHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: Colors.GRAY,
-    borderRadius: Radius.CARD,
-    padding: Spacing.MD,
-    marginBottom: Spacing.MD,
-  },
-  deliveryLeft: {
-    flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    marginBottom: space.md,
   },
-  statusIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: Colors.PRIMARY,
+  restaurantName: {
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.neutral[900],
+  },
+  statusBadge: {
+    backgroundColor: colors.primary[100],
+    color: colors.primary[500],
+    paddingHorizontal: space.sm,
+    paddingVertical: space.xs,
+    borderRadius: borderRadius.sm,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+  },
+  orderDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  deliveryTime: {
+    fontSize: typography.fontSize.base,
+    color: colors.neutral[500],
+  },
+  deliveryFee: {
+    fontSize: typography.fontSize.sm,
+    color: colors.primary[500],
+    fontWeight: typography.fontWeight.medium,
+  },
+  emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
+    padding: space.lg,
   },
-  deliveryInfo: {
-    marginLeft: Spacing.MD,
-    flex: 1,
+  emptyTitle: {
+    fontSize: typography.fontSize.xl,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.neutral[900],
+    marginBottom: space.sm,
   },
-  deliveryTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: Colors.BLACK,
-  },
-  deliveryMeta: {
-    fontSize: 13,
-    color: Colors.DARK_GRAY,
-    marginTop: 2,
-  },
-  trackBtn: {
-    backgroundColor: Colors.BLACK,
-    paddingHorizontal: Spacing.MD,
-    paddingVertical: Spacing.SM,
-    borderRadius: Radius.CHIP,
-  },
-  trackBtnText: {
-    color: Colors.WHITE,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  windowCard: {
-    backgroundColor: Colors.GRAY,
-    borderRadius: Radius.CARD,
-    padding: Spacing.MD,
-    marginBottom: Spacing.MD,
-  },
-  windowLabel: {
-    fontSize: 13,
-    color: Colors.DARK_GRAY,
-    fontWeight: '500',
-  },
-  windowTime: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.BLACK,
-    marginTop: 4,
-    marginBottom: 4,
-  },
-  windowMeta: {
-    fontSize: 13,
-    color: Colors.GREEN,
-    fontWeight: '500',
-  },
-  doubleDashCard: {
-    backgroundColor: Colors.WHITE,
-    borderRadius: Radius.CARD,
-    padding: Spacing.MD,
-    marginBottom: Spacing.MD,
-    borderWidth: 2,
-    borderColor: Colors.PRIMARY,
-  },
-  doubleDashHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  doubleDashIcon: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: Colors.GRAY,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: Spacing.SM,
-  },
-  doubleDashTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.BLACK,
-  },
-  doubleDashTimer: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: Colors.PRIMARY,
-    marginBottom: 4,
-  },
-  doubleDashSubtitle: {
-    fontSize: 13,
-    color: Colors.DARK_GRAY,
-    lineHeight: 18,
-  },
-  addOnsSection: {
-    marginBottom: Spacing.MD,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.BLACK,
-    marginBottom: Spacing.MD,
-  },
-  addOnRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: Colors.GRAY,
-    borderRadius: Radius.CARD,
-    padding: Spacing.MD,
-    marginBottom: Spacing.SM,
-  },
-  addOnLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  addOnEmoji: {
-    fontSize: 24,
-    marginRight: Spacing.MD,
-  },
-  addOnName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: Colors.BLACK,
-  },
-  addOnMeta: {
-    fontSize: 13,
-    color: Colors.DARK_GRAY,
-    marginTop: 2,
-  },
-  addBtn: {
-    backgroundColor: Colors.WHITE,
-    borderWidth: 1,
-    borderColor: Colors.BLACK,
-    paddingHorizontal: Spacing.MD,
-    paddingVertical: 8,
-    borderRadius: Radius.CHIP,
-  },
-  addBtnText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.BLACK,
-  },
-  healthSection: {
-    marginBottom: Spacing.XL * 2,
-  },
-  healthGrid: {
-    gap: Spacing.SM,
-  },
-  healthItem: {
-    flex: 1,
-    backgroundColor: Colors.GRAY,
-    borderRadius: Radius.CARD,
-    padding: Spacing.MD,
-    alignItems: 'center',
-    margin: 4,
-  },
-  healthEmoji: {
-    fontSize: 28,
-    marginBottom: 6,
-  },
-  healthName: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.BLACK,
+  emptySubtitle: {
+    fontSize: typography.fontSize.base,
+    color: colors.neutral[500],
     textAlign: 'center',
+    maxWidth: 200,
   },
 });

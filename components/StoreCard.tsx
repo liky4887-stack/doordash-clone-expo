@@ -1,7 +1,25 @@
+/**
+ * StoreCard - Premium restaurant store card with hover lift and micro-interactions
+ * Features: Animated lift on press, design tokens integration, accessibility labels
+ */
+
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Radius, Spacing } from '@/constants/colors';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  FadeIn,
+} from 'react-native-reanimated';
+import colors from "@/src/design-tokens/colors";
+import typography from "@/src/design-tokens/typography";
+import { space } from "@/src/design-tokens/spacing";
+import { borderRadius } from "@/src/design-tokens/border-radius";
+import { shadows } from "@/src/design-tokens/shadows";
 import { Store } from '@/constants/mockData';
+
+
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface StoreCardProps {
   store: Store;
@@ -9,101 +27,120 @@ interface StoreCardProps {
   onPress?: () => void;
 }
 
-export default function StoreCard({ store, showBadge, onPress }: StoreCardProps) {
+export default function StoreCard({ store, showBadge = true, onPress }: StoreCardProps) {
+  const scale = useSharedValue(1);
+
+  const handlePressIn = () => {
+    scale.value = withTiming(0.97, { duration: 100 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withTiming(1, { duration: 100 });
+  };
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
-      <View style={styles.imageContainer}>
-        <Text style={styles.emoji}>{store.emoji}</Text>
-        {showBadge && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>DASHPASS</Text>
+    <Animated.View entering={FadeIn.duration(300).springify()} style={[styles.container, animatedStyle]}>
+      <AnimatedTouchableOpacity
+        style={styles.content}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        activeOpacity={0.8}
+        accessibilityRole="button"
+        accessibilityLabel={`Order from ${store.name}`}
+      >
+        <View style={styles.imageContainer}>
+          <Text style={styles.emoji}>{store.emoji}</Text>
+        </View>
+
+        <View style={styles.details}>
+          <Text style={styles.name}>{store.name}</Text>
+
+          <View style={styles.meta}>
+            <Text style={styles.rating}>{'⭐'.repeat(Math.min(parseInt(store.rating), 5))}</Text>
+            <Text style={styles.reviews}>{store.reviews} reviews</Text>
           </View>
-        )}
-        {store.tag && !showBadge && (
-          <View style={styles.tagBadge}>
-            <Text style={styles.tagBadgeText}>{store.tag}</Text>
-          </View>
-        )}
-      </View>
-      <View style={styles.info}>
-        <Text style={styles.name} numberOfLines={1}>{store.name}</Text>
-        <Text style={styles.meta}>{store.rating} ⭐ ({store.reviews})</Text>
-        <Text style={styles.meta}>{store.distance} · {store.time}</Text>
-        <Text style={styles.fee}>{store.feeText}</Text>
-      </View>
-    </TouchableOpacity>
+
+          {showBadge && store.tag ? (
+            <Text style={styles.tag}>{store.tag}</Text>
+          ) : null}
+
+          <Text style={styles.fee}>Fee: {store.feeText}</Text>
+        </View>
+      </AnimatedTouchableOpacity>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.WHITE,
-    borderRadius: Radius.CARD,
-    marginBottom: Spacing.MD,
+  container: {
+    backgroundColor: colors.background.primary,
+    borderRadius: borderRadius.lg,
     overflow: 'hidden',
-    elevation: 2,
-    shadowColor: Colors.BLACK,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
+    ...shadows.md,
+    elevation: 4,
+  },
+  content: {
+    padding: space.lg,
   },
   imageContainer: {
-    height: 120,
-    backgroundColor: Colors.GRAY,
+    width: 80,
+    height: 80,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.neutral[100],
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
+    marginBottom: space.lg,
   },
   emoji: {
-    fontSize: 48,
+    fontSize: 40,
   },
-  badge: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    backgroundColor: Colors.BLACK,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  badgeText: {
-    color: Colors.WHITE,
-    fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-  tagBadge: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    backgroundColor: Colors.PRIMARY,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  tagBadgeText: {
-    color: Colors.WHITE,
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  info: {
-    padding: Spacing.MD,
+  details: {
+    alignItems: 'center',
   },
   name: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.BLACK,
-    marginBottom: 4,
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.neutral[900],
+    marginBottom: space.xs,
+    textAlign: 'center',
   },
   meta: {
-    fontSize: 13,
-    color: Colors.DARK_GRAY,
-    marginBottom: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    marginBottom: space.xs,
+  },
+  rating: {
+    fontSize: typography.fontSize.xs,
+    color: colors.primary[500],
+    marginRight: space.xs,
+  },
+  reviews: {
+    fontSize: typography.fontSize.xs,
+    color: colors.neutral[500],
+  },
+  tag: {
+    position: 'absolute',
+    top: space.xs,
+    left: space.xs,
+    backgroundColor: colors.primary[500],
+    color: colors.background.inverse,
+    borderRadius: borderRadius.sm,
+    paddingHorizontal: space.sm,
+    paddingVertical: space.xs,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
   },
   fee: {
-    fontSize: 13,
-    color: Colors.GREEN,
-    fontWeight: '600',
-    marginTop: 4,
+    fontSize: typography.fontSize.sm,
+    color: colors.semantic.success,
+    fontWeight: typography.fontWeight.medium,
+    marginTop: space.xs,
   },
 });

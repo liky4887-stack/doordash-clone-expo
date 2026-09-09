@@ -1,7 +1,25 @@
+/**
+ * CartItemRow - Individual cart item with animations and haptic feedback
+ * Features: Reanimated press feedback, animated removal, haptic feedback
+ */
+
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Radius, Spacing } from '@/constants/colors';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  FadeIn,
+  FadeOut,
+} from 'react-native-reanimated';
+import colors from "@/src/design-tokens/colors";
+import typography from "@/src/design-tokens/typography";
+import { shadows } from "@/src/design-tokens/shadows";
+import { space } from "@/src/design-tokens/spacing";
+import { borderRadius } from "@/src/design-tokens/border-radius";
 import { CartItem } from '@/store/useCartStore';
+import * as Haptics from 'expo-haptics';
 
 interface CartItemRowProps {
   item: CartItem;
@@ -10,106 +28,153 @@ interface CartItemRowProps {
   onRemove: (id: string) => void;
 }
 
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
+
 export default function CartItemRow({ item, onIncrement, onDecrement, onRemove }: CartItemRowProps) {
+  const scale = useSharedValue(1);
+  const opacity = useSharedValue(1);
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.95, { damping: 10, stiffness: 200 });
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 10, stiffness: 200 });
+  };
+
+  const handleRemove = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    opacity.value = withTiming(0, { duration: 300 }, () => {
+      onRemove(item.id);
+    });
+  };
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+
   return (
-    <View style={styles.row}>
-      <View style={styles.emojiContainer}>
-        <Text style={styles.emoji}>{item.image}</Text>
-      </View>
-      <View style={styles.info}>
-        <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
-        <Text style={styles.price}>${item.price.toFixed(2)}</Text>
-      </View>
-      <View style={styles.controls}>
-        <TouchableOpacity
-          style={styles.qtyBtn}
-          onPress={() => onDecrement(item.id)}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="remove" size={18} color={Colors.BLACK} />
-        </TouchableOpacity>
-        <Text style={styles.quantity}>{item.quantity}</Text>
-        <TouchableOpacity
-          style={styles.qtyBtn}
-          onPress={() => onIncrement(item.id)}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="add" size={18} color={Colors.BLACK} />
-        </TouchableOpacity>
+    <Animated.View entering={FadeIn.duration(300).springify()} style={[styles.container, animatedStyle]}>
+      <AnimatedTouchableOpacity
+        style={styles.content}
+        activeOpacity={0.7}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.name}, quantity ${item.quantity}`}
+      >
+        <View style={styles.emojiContainer}>
+          <Text style={styles.emoji}>{item.image}</Text>
+        </View>
+
+        <View style={styles.info}>
+          <Text style={styles.name}>{item.name}</Text>
+          <Text style={styles.price}>${item.price.toFixed(2)}</Text>
+        </View>
+
+        <View style={styles.quantityContainer}>
+          <TouchableOpacity
+            style={styles.qtyBtn}
+            onPress={() => onDecrement(item.id)}
+            accessibilityRole="button"
+            accessibilityLabel={`Decrease ${item.name} quantity`}
+          >
+            <Ionicons name="remove" size={16} color={colors.neutral[600]} />
+          </TouchableOpacity>
+
+          <Text style={styles.quantity}>{item.quantity}</Text>
+
+          <TouchableOpacity
+            style={styles.qtyBtn}
+            onPress={() => onIncrement(item.id)}
+            accessibilityRole="button"
+            accessibilityLabel={`Increase ${item.name} quantity`}
+          >
+            <Ionicons name="add" size={16} color={colors.primary[500]} />
+          </TouchableOpacity>
+        </View>
+
         <TouchableOpacity
           style={styles.removeBtn}
-          onPress={() => onRemove(item.id)}
-          activeOpacity={0.7}
+          onPress={handleRemove}
+          accessibilityRole="button"
+          accessibilityLabel={`Remove ${item.name} from cart`}
         >
-          <Ionicons name="trash-outline" size={16} color={Colors.DARK_GRAY} />
+          <Ionicons name="trash-outline" size={18} color={colors.semantic.error} />
         </TouchableOpacity>
-      </View>
-    </View>
+      </AnimatedTouchableOpacity>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
+  container: {
+    flexDirection: 'row',
+    backgroundColor: colors.background.primary,
+    borderRadius: borderRadius.lg,
+    padding: space.md,
+    marginBottom: space.sm,
+    ...shadows.sm,
+  },
+  content: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.WHITE,
-    borderRadius: Radius.CARD,
-    padding: Spacing.MD,
-    marginBottom: Spacing.SM,
-    elevation: 1,
-    shadowColor: Colors.BLACK,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
   },
   emojiContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 12,
-    backgroundColor: Colors.GRAY,
+    width: 48,
+    height: 48,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.neutral[100],
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: space.md,
   },
   emoji: {
-    fontSize: 28,
+    fontSize: 24,
   },
   info: {
     flex: 1,
-    marginLeft: Spacing.MD,
   },
   name: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: Colors.BLACK,
-    marginBottom: 4,
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.semibold,
+    color: colors.neutral[900],
+    marginBottom: 2,
   },
   price: {
-    fontSize: 14,
-    color: Colors.DARK_GRAY,
-    fontWeight: '500',
+    fontSize: typography.fontSize.sm,
+    color: colors.primary[500],
+    fontWeight: typography.fontWeight.medium,
   },
-  controls: {
+  quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: colors.neutral[100],
+    borderRadius: borderRadius.pill,
+    paddingHorizontal: space.sm,
+    paddingVertical: 4,
+    marginRight: space.sm,
   },
   qtyBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.GRAY,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   quantity: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.BLACK,
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.neutral[900],
     marginHorizontal: 10,
     minWidth: 20,
     textAlign: 'center',
   },
   removeBtn: {
-    marginLeft: Spacing.SM,
-    padding: 4,
+    padding: space.xs,
+    marginLeft: space.sm,
   },
 });
