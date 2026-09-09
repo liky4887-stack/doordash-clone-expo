@@ -1,7 +1,24 @@
+/**
+ * DealCard - Premium deal/promotion card with hover lift effect
+ * Features: Animated lift on press, design tokens integration, accessibility labels
+ */
+
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Radius, Spacing } from '@/constants/colors';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  FadeIn,
+} from 'react-native-reanimated';
+import colors from "@/src/design-tokens/colors";
+import typography from "@/src/design-tokens/typography";
+import { space } from "@/src/design-tokens/spacing";
+import { borderRadius } from "@/src/design-tokens/border-radius";
+import { shadows } from "@/src/design-tokens/shadows";
 import { Deal } from '@/constants/mockData';
+
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface DealCardProps {
   deal: Deal;
@@ -9,95 +26,105 @@ interface DealCardProps {
 }
 
 export default function DealCard({ deal, onPress }: DealCardProps) {
+  const scale = useSharedValue(1);
+
+  const handlePressIn = () => {
+    scale.value = withTiming(0.97, { duration: 100 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withTiming(1, { duration: 100 });
+  };
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
-      <View style={styles.imageContainer}>
-        <Text style={styles.emoji}>{deal.emoji}</Text>
-        <View style={styles.dealBadge}>
-          <Ionicons name="pricetag" size={12} color={Colors.WHITE} />
-          <Text style={styles.dealBadgeText}>DEAL</Text>
+    <Animated.View entering={FadeIn.duration(300).springify()} style={[styles.container, animatedStyle]}>
+      <AnimatedTouchableOpacity
+        style={styles.content}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        activeOpacity={0.8}
+        accessibilityRole="button"
+        accessibilityLabel={`View deal: ${deal.title}`}
+      >
+        <View style={styles.emojiContainer}>
+          <Text style={styles.emoji}>{deal.emoji}</Text>
         </View>
-      </View>
-      <View style={styles.info}>
-        <Text style={styles.title} numberOfLines={1}>{deal.title}</Text>
-        <Text style={styles.subtitle} numberOfLines={1}>{deal.subtitle}</Text>
-        <View style={styles.metaRow}>
-          <Text style={styles.storeName} numberOfLines={1}>{deal.storeName}</Text>
+
+        <View style={styles.info}>
+          <Text style={styles.title}>{deal.title}</Text>
+          <Text style={styles.subtitle}>{deal.subtitle}</Text>
+          <Text style={styles.storeName}>{deal.storeName}</Text>
+
+          <View style={styles.metaRow}>
+            <Text style={styles.meta}>⭐ {deal.rating}</Text>
+            <Text style={styles.meta}>⏱ {deal.time}</Text>
+            <Text style={styles.meta}>📍 {deal.distance}</Text>
+          </View>
         </View>
-        <Text style={styles.meta}>{deal.distance} · {deal.time} · {deal.rating} ⭐</Text>
-      </View>
-    </TouchableOpacity>
+      </AnimatedTouchableOpacity>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.WHITE,
-    borderRadius: Radius.CARD,
-    marginBottom: Spacing.MD,
+  container: {
+    backgroundColor: colors.background.primary,
+    borderRadius: borderRadius.lg,
     overflow: 'hidden',
-    elevation: 2,
-    shadowColor: Colors.BLACK,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    width: 260,
-    marginRight: Spacing.MD,
+    ...shadows.md,
+    elevation: 4,
+    marginRight: space.md,
+    minWidth: 160,
   },
-  imageContainer: {
-    height: 100,
-    backgroundColor: Colors.GRAY,
+  content: {
+    padding: space.lg,
+  },
+  emojiContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.neutral[100],
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
+    marginBottom: space.md,
   },
   emoji: {
-    fontSize: 40,
-  },
-  dealBadge: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.PRIMARY,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  dealBadgeText: {
-    color: Colors.WHITE,
-    fontSize: 10,
-    fontWeight: '700',
-    marginLeft: 4,
+    fontSize: 32,
   },
   info: {
-    padding: Spacing.MD,
+    alignItems: 'center',
   },
   title: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: Colors.BLACK,
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.neutral[900],
     marginBottom: 2,
   },
   subtitle: {
-    fontSize: 13,
-    color: Colors.DARK_GRAY,
-    marginBottom: 6,
+    fontSize: typography.fontSize.sm,
+    color: colors.neutral[500],
+    marginBottom: 4,
+  },
+  storeName: {
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.medium,
+    color: colors.neutral[900],
+    marginBottom: 4,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 2,
-  },
-  storeName: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.BLACK,
-    flex: 1,
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    gap: space.xs,
   },
   meta: {
-    fontSize: 12,
-    color: Colors.DARK_GRAY,
+    fontSize: typography.fontSize.xs,
+    color: colors.neutral[500],
   },
 });

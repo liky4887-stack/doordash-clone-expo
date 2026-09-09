@@ -1,6 +1,22 @@
+/**
+ * CategoryChip - Animated category selection chip
+ * Features: Reanimated press feedback, design tokens integration
+ */
+
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Colors, Radius, Spacing } from '@/constants/colors';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
+import colors from "@/src/design-tokens/colors";
+import typography from "@/src/design-tokens/typography";
+import { space } from "@/src/design-tokens/spacing";
+import { borderRadius } from "@/src/design-tokens/border-radius";
 import { Category } from '@/constants/mockData';
+import * as Haptics from 'expo-haptics';
+
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface CategoryChipProps {
   category: Category;
@@ -8,44 +24,62 @@ interface CategoryChipProps {
   onPress?: () => void;
 }
 
-export default function CategoryChip({ category, selected, onPress }: CategoryChipProps) {
+export default function CategoryChip({ category, selected = false, onPress }: CategoryChipProps) {
+  const scale = useSharedValue(1);
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.92, { damping: 10, stiffness: 200 });
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 10, stiffness: 200 });
+  };
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   return (
-    <TouchableOpacity
-      style={[styles.chip, selected && styles.chipSelected]}
-      onPress={onPress}
+    <AnimatedTouchableOpacity
+      style={[styles.container, selected && styles.selected, animatedStyle]}
       activeOpacity={0.7}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Filter by ${category.label}`}
+      accessibilityState={{ selected }}
     >
       <Text style={styles.emoji}>{category.emoji}</Text>
-      <Text style={[styles.label, selected && styles.labelSelected]}>
-        {category.label}
-      </Text>
-    </TouchableOpacity>
+      <Text style={[styles.label, selected && styles.labelSelected]}>{category.label}</Text>
+    </AnimatedTouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  chip: {
+  container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.GRAY,
-    paddingHorizontal: Spacing.MD,
-    paddingVertical: Spacing.SM,
-    borderRadius: Radius.CHIP,
-    marginRight: Spacing.SM,
+    backgroundColor: colors.neutral[100],
+    paddingHorizontal: space.md,
+    paddingVertical: space.sm,
+    borderRadius: borderRadius.pill,
+    marginRight: space.sm,
   },
-  chipSelected: {
-    backgroundColor: Colors.BLACK,
+  selected: {
+    backgroundColor: colors.primary[500],
   },
   emoji: {
-    fontSize: 16,
-    marginRight: 6,
+    fontSize: typography.fontSize.base,
+    marginRight: space.sm,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.BLACK,
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.medium,
+    color: colors.neutral[900],
   },
   labelSelected: {
-    color: Colors.WHITE,
+    color: colors.background.inverse,
   },
 });
