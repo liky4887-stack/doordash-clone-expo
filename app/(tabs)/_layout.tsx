@@ -3,13 +3,12 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCartStore } from '@/store/useCartStore';
 import MacOSDock, { DockApp } from '@/components/ui/mac-os-dock';
-import { Coffee, Receipt, Gift, ShoppingCart } from 'lucide-react-native';
 
 const dockApps: DockApp[] = [
-  { id: 'index', name: 'Menu', icon: Coffee },
-  { id: 'orders', name: 'Orders', icon: Receipt },
-  { id: 'dashpass', name: 'Rewards', icon: Gift },
-  { id: 'cart', name: 'Cart', icon: ShoppingCart },
+  { id: 'index', name: 'Menu' },
+  { id: 'orders', name: 'Orders' },
+  { id: 'dashpass', name: 'Rewards' },
+  { id: 'cart', name: 'Cart' },
 ];
 
 function CustomTabBar({ state, navigation }: { state: any; navigation: any }) {

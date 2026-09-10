@@ -23,7 +23,7 @@ import { Colors } from '@/constants/colors';
 export interface DockApp {
   id: string;
   name: string;
-  icon: React.ComponentType<{ size: number; color: string; strokeWidth?: number }>;
+  icon?: React.ComponentType<{ size: number; color: string; strokeWidth?: number }>;
 }
 
 export interface MacOSDockProps {
@@ -36,11 +36,10 @@ export interface MacOSDockProps {
 }
 
 const BASE_ICON_SIZE = 52;
-const MAX_SCALE = 1.6;
+const MAX_SCALE = 1.18;
 const MIN_SCALE = 1.0;
-const EFFECT_WIDTH = 220;
-const SPACING = 8;
-const PADDING = 12;
+const EFFECT_WIDTH = 200;
+const PADDING = 10;
 
 export default function MacOSDock({
   apps,
@@ -89,6 +88,7 @@ export default function MacOSDock({
   useEffect(() => {
     const interval = setInterval(() => {
       const mx = touchX.value;
+      const slotWidth = dockWidth.current / apps.length;
       if (mx === null) {
         scales.forEach((sv, i) => {
           if (i < apps.length && Math.abs(sv.value - MIN_SCALE) > 0.005) {
@@ -97,22 +97,19 @@ export default function MacOSDock({
         });
         return;
       }
-      const totalIconsWidth = apps.length * BASE_ICON_SIZE + (apps.length - 1) * SPACING;
-      const sidePadding = (dockWidth.current - totalIconsWidth) / 2;
       apps.forEach((_, i) => {
-        const iconCenter = sidePadding + i * (BASE_ICON_SIZE + SPACING) + BASE_ICON_SIZE / 2;
+        const slotCenter = slotWidth * i + slotWidth / 2;
         const min = mx - EFFECT_WIDTH / 2;
         const max = mx + EFFECT_WIDTH / 2;
         const sv = scales[i];
-        if (iconCenter < min || iconCenter > max) {
+        if (slotCenter < min || slotCenter > max) {
           if (Math.abs(sv.value - MIN_SCALE) > 0.005) {
             sv.value = withSpring(MIN_SCALE, { damping: 18, stiffness: 300 });
           }
           return;
         }
-        const theta = ((iconCenter - min) / EFFECT_WIDTH) * 2 * Math.PI;
-        const capped = Math.min(Math.max(theta, 0), 2 * Math.PI);
-        const factor = (1 - Math.cos(capped)) / 2;
+        const dist = Math.abs(slotCenter - mx);
+        const factor = 1 - dist / (EFFECT_WIDTH / 2);
         const target = MIN_SCALE + factor * (MAX_SCALE - MIN_SCALE);
         sv.value = withSpring(target, { damping: 16, stiffness: 280 });
       });
@@ -124,44 +121,41 @@ export default function MacOSDock({
     <GestureDetector gesture={gesture}>
       <View
         onLayout={handleLayout}
-        style={[styles.dockContainer, { height: BASE_ICON_SIZE + PADDING * 2 + 6 + bottomInset }, style]}
+        style={[styles.dockContainer, { height: 64 + bottomInset }, style]}
       >
         <BlurView intensity={80} tint="light" style={StyleSheet.absoluteFillObject} />
         <View style={styles.dockInner}>
-          {apps.map((app, index) => {
-            const Icon = app.icon;
-            return (
-              <DockIcon
-                key={app.id}
-                scale={scales[index]}
-                isActive={activeIndex === index}
-                badge={app.id === 'cart' ? badge : undefined}
-                onPress={() => onAppClick(index)}
-                Icon={Icon}
-              />
-            );
-          })}
+          {apps.map((app, index) => (
+            <DockItem
+              key={app.id}
+              label={app.name}
+              scale={scales[index]}
+              isActive={activeIndex === index}
+              badge={app.id === 'cart' ? badge : undefined}
+              onPress={() => onAppClick(index)}
+            />
+          ))}
         </View>
       </View>
     </GestureDetector>
   );
 }
 
-interface DockIconProps {
+interface DockItemProps {
+  label: string;
   scale: SharedValue<number>;
   isActive: boolean;
   badge?: number;
   onPress: () => void;
-  Icon: React.ComponentType<{ size: number; color: string; strokeWidth?: number }>;
 }
 
-const DockIcon = React.memo(function DockIcon({
+const DockItem = React.memo(function DockItem({
+  label,
   scale,
   isActive,
   badge,
   onPress,
-  Icon,
-}: DockIconProps) {
+}: DockItemProps) {
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
@@ -176,9 +170,9 @@ const DockIcon = React.memo(function DockIcon({
   }));
 
   return (
-    <Pressable onPress={onPress} style={styles.iconWrapper}>
-      <Animated.View style={[styles.iconBox, animatedStyle]}>
-        <Icon size={30} color={Colors.BRAND} strokeWidth={2} />
+    <Pressable onPress={onPress} style={styles.itemWrapper}>
+      <Animated.View style={[styles.labelBox, animatedStyle, isActive && styles.labelBoxActive]}>
+        <Text style={[styles.label, isActive && styles.labelActive]}>{label}</Text>
         {badge !== undefined && badge > 0 ? (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{badge > 99 ? '99+' : badge}</Text>
@@ -192,7 +186,6 @@ const DockIcon = React.memo(function DockIcon({
 
 const styles = StyleSheet.create({
   dockContainer: {
-    height: BASE_ICON_SIZE + PADDING * 2 + 6,
     overflow: 'hidden',
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.72)',
@@ -208,27 +201,37 @@ const styles = StyleSheet.create({
   dockInner: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 0,
-    paddingBottom: PADDING,
-    paddingTop: PADDING,
+    paddingVertical: PADDING,
     gap: 0,
   },
-  iconWrapper: {
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+  itemWrapper: {
     flex: 1,
-    height: BASE_ICON_SIZE,
-    maxWidth: 104,
-  },
-  iconBox: {
-    width: BASE_ICON_SIZE,
-    height: BASE_ICON_SIZE,
-    borderRadius: 14,
-    backgroundColor: 'rgba(111,78,55,0.08)',
     alignItems: 'center',
     justifyContent: 'center',
+    height: 44,
+  },
+  labelBox: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 14,
+    backgroundColor: 'transparent',
+  },
+  labelBoxActive: {
+    backgroundColor: 'rgba(111,78,55,0.1)',
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.DARK_GRAY,
+  },
+  labelActive: {
+    color: Colors.BRAND,
+    fontWeight: '700',
   },
   dot: {
     width: 4,
@@ -239,8 +242,8 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: 'absolute',
-    top: -4,
-    right: -4,
+    top: -2,
+    right: -8,
     minWidth: 18,
     height: 18,
     borderRadius: 9,
