@@ -282,6 +282,6 @@ const styles = StyleSheet.create({
     color: Colors.EMERALD_600,
   },
   bottomPadding: {
-    height: Spacing.XL * 2,
+    height: 120,
   },
 });

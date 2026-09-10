@@ -280,6 +280,6 @@ const styles = StyleSheet.create({
     marginTop: Spacing.SM,
   },
   bottomPadding: {
-    height: Spacing.XL * 2,
+    height: 120,
   },
 });

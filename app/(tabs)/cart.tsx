@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.WHITE,
     paddingHorizontal: Spacing.LG,
     paddingTop: Spacing.LG,
-    paddingBottom: Spacing.XL * 3,
+    paddingBottom: 130,
     marginTop: Spacing.MD,
     borderTopWidth: 1,
     borderTopColor: Colors.LIGHT_GRAY,
