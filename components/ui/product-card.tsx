@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, Text, View, ViewStyle, StyleProp } from 'react-native';
 import { Check, Heart, ShoppingCart, Star } from 'lucide-react-native';
-import { Colors, Radius, Spacing } from '@/constants/colors';
+import { Colors } from '@/constants/colors';
 import SmoothButton from '@/components/ui/smooth-button';
 
 export interface ProductCardProps {
   badge?: string;
-  style?: import('react-native').StyleProp<ViewStyle>;
   currency?: string;
   image: string;
   onAddToCart?: () => void;
@@ -14,35 +13,16 @@ export interface ProductCardProps {
   originalPrice?: number;
   price: number;
   rating?: number;
+  style?: StyleProp<ViewStyle>;
   title: string;
 }
 
 const badgeColors: Record<string, string> = {
-  sale: Colors.RED_500,
-  new: Colors.EMERALD_600,
-  dashpass: Colors.BRAND,
+  sale: '#E63946',
+  new: '#2A9D8F',
+  popular: '#2D1B12',
+  reward: '#6F4E37',
 };
-
-function Rating({ value }: { value: number }) {
-  const filledStars = Math.round(value);
-
-  return (
-    <View style={styles.ratingRow}>
-      <View style={styles.stars}>
-        {Array.from({ length: 5 }, (_, index) => (
-          <Star
-            key={`rating-${index}`}
-            size={13}
-            color={index < filledStars ? Colors.AMBER : Colors.LIGHT_GRAY}
-            fill={index < filledStars ? Colors.AMBER : 'transparent'}
-            strokeWidth={1.5}
-          />
-        ))}
-      </View>
-      <Text style={styles.ratingText}>{value.toFixed(1)}</Text>
-    </View>
-  );
-}
 
 export default function ProductCard({
   badge,
@@ -58,10 +38,12 @@ export default function ProductCard({
 }: ProductCardProps) {
   const [added, setAdded] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
+
   const discount = originalPrice && originalPrice > price
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
     : null;
-  const badgeColor = badge ? badgeColors[badge.toLowerCase()] ?? Colors.BLACK : Colors.BLACK;
+
+  const badgeColor = badge ? badgeColors[badge.toLowerCase()] ?? '#6F4E37' : undefined;
 
   const handleAdd = () => {
     if (added) return;
@@ -77,18 +59,18 @@ export default function ProductCard({
 
   return (
     <View style={[styles.card, style]}>
+      {/* Image area - plain white, no separate background/border */}
       <View style={styles.imageArea}>
         <Text style={styles.emoji}>{image}</Text>
+
+        {/* Badge - top-left absolute */}
         {badge ? (
           <View style={[styles.badge, { backgroundColor: badgeColor }]}>
             <Text style={styles.badgeText}>{badge}</Text>
           </View>
         ) : null}
-        {discount ? (
-          <View style={styles.discountPill}>
-            <Text style={styles.discountText}>-{discount}%</Text>
-          </View>
-        ) : null}
+
+        {/* Heart button - top-right absolute */}
         <Pressable
           accessibilityLabel={wishlisted ? `Remove ${title} from wishlist` : `Add ${title} to wishlist`}
           accessibilityRole="button"
@@ -97,22 +79,38 @@ export default function ProductCard({
         >
           <Heart
             size={17}
-            color={wishlisted ? Colors.RED_500 : Colors.MUTED_FOREGROUND}
+            color={wishlisted ? Colors.RED_500 : '#8C7B6B'}
             fill={wishlisted ? Colors.RED_500 : 'transparent'}
             strokeWidth={2}
           />
         </Pressable>
       </View>
 
+      {/* Content area */}
       <View style={styles.content}>
         <Text numberOfLines={2} style={styles.title}>{title}</Text>
-        {rating !== undefined ? <Rating value={rating} /> : null}
+
+        {rating !== undefined && (
+          <View style={styles.ratingRow}>
+            <Star size={14} color="#8B7355" fill="#8B7355" strokeWidth={1} />
+            <Text style={styles.ratingText}>{rating.toFixed(1)}</Text>
+          </View>
+        )}
+
         <View style={styles.priceRow}>
           <Text style={styles.price}>{currency}{price.toFixed(2)}</Text>
           {originalPrice && originalPrice > price ? (
             <Text style={styles.originalPrice}>{currency}{originalPrice.toFixed(2)}</Text>
           ) : null}
         </View>
+
+        {/* Discount pill on image area (absolute bottom-left) */}
+        {discount ? (
+          <View style={styles.discountPill}>
+            <Text style={styles.discountText}>-{discount}%</Text>
+          </View>
+        ) : null}
+
         <SmoothButton
           accessibilityLabel={added ? `${title} added to cart` : `Add ${title} to cart`}
           disabled={added}
@@ -120,8 +118,14 @@ export default function ProductCard({
           style={[styles.addButton, added && styles.addedButton]}
           variant="default"
         >
-          {added ? <Check color={Colors.WHITE} size={16} strokeWidth={2.5} /> : <ShoppingCart color={Colors.WHITE} size={16} strokeWidth={2} />}
-          <Text style={styles.addButtonText}>{added ? 'Added' : 'Add to cart'}</Text>
+          <View style={styles.addButtonContent}>
+            {added ? (
+              <Check color={Colors.WHITE} size={14} strokeWidth={2.5} />
+            ) : (
+              <ShoppingCart color={Colors.WHITE} size={14} strokeWidth={2} />
+            )}
+            <Text style={styles.addButtonText}>{added ? 'Added' : 'Add to cart'}</Text>
+          </View>
         </SmoothButton>
       </View>
     </View>
@@ -131,34 +135,33 @@ export default function ProductCard({
 const styles = StyleSheet.create({
   card: {
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.82)',
-    borderColor: 'rgba(255,255,255,0.65)',
-    borderRadius: Radius.CARD,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
     borderWidth: 1,
+    borderColor: '#F0EAE3',
     overflow: 'hidden',
-    shadowColor: '#111827',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.07,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
     shadowRadius: 8,
-    elevation: 3,
+    elevation: 2,
   },
   imageArea: {
-    height: 126,
-    backgroundColor: 'rgba(255,247,245,0.7)',
+    height: 90,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
   },
   emoji: {
-    fontSize: 54,
+    fontSize: 56,
   },
   badge: {
     position: 'absolute',
     left: 10,
     top: 10,
-    borderRadius: 6,
+    borderRadius: 12,
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 3,
   },
   badgeText: {
     color: Colors.WHITE,
@@ -170,7 +173,7 @@ const styles = StyleSheet.create({
     bottom: 10,
     left: 10,
     backgroundColor: Colors.RED_50,
-    borderRadius: 6,
+    borderRadius: 8,
     paddingHorizontal: 6,
     paddingVertical: 3,
   },
@@ -181,71 +184,80 @@ const styles = StyleSheet.create({
   },
   heartButton: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.94)',
-    borderRadius: 18,
-    height: 36,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 16,
+    height: 32,
     justifyContent: 'center',
     position: 'absolute',
     right: 10,
     top: 10,
-    width: 36,
+    width: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 1,
   },
   pressed: {
     opacity: 0.65,
   },
   content: {
-    gap: 7,
-    padding: Spacing.MD,
+    padding: 12,
+    gap: 6,
   },
   title: {
-    color: Colors.BLACK,
-    fontSize: 15,
-    fontWeight: '700',
-    lineHeight: 19,
-    minHeight: 38,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2D1B12',
+    marginBottom: 6,
   },
   ratingRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    flexDirection: 'row',
-  },
-  stars: {
-    flexDirection: 'row',
-    gap: 1,
+    gap: 4,
   },
   ratingText: {
-    color: Colors.MUTED_FOREGROUND,
+    color: '#8B7355',
     fontSize: 12,
-    marginLeft: 5,
+    fontWeight: '500',
   },
   priceRow: {
-    alignItems: 'baseline',
     flexDirection: 'row',
-    gap: 7,
-    minHeight: 24,
+    alignItems: 'center',
+    gap: 6,
+    minHeight: 20,
   },
   price: {
-    color: Colors.PRIMARY,
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#6F4E37',
   },
   originalPrice: {
-    color: Colors.MUTED_FOREGROUND,
     fontSize: 12,
+    color: '#8B7355',
     textDecorationLine: 'line-through',
   },
   addButton: {
-    backgroundColor: Colors.PRIMARY,
-    borderRadius: 10,
-    height: 38,
-    paddingHorizontal: 10,
-    width: '100%',
+    backgroundColor: '#6F4E37',
+    borderRadius: 8,
+    height: 36,
+    marginTop: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
   addedButton: {
     backgroundColor: Colors.EMERALD_600,
   },
+  addButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    justifyContent: 'center',
+    width: '100%',
+  },
   addButtonText: {
     color: Colors.WHITE,
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
   },
 });

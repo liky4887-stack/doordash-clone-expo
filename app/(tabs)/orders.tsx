@@ -251,8 +251,14 @@ const styles = StyleSheet.create({
     color: Colors.DARK_GRAY,
     marginBottom: Spacing.MD,
   },
-  ordersGrid: {},
+  ordersGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+  },
   ordersRow: {
+    width: '100%',
     flexDirection: 'row',
     gap: Spacing.SM,
     marginBottom: Spacing.MD,

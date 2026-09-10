@@ -218,15 +218,20 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.MD,
   },
   productGrid: {
-    paddingHorizontal: Spacing.LG,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
   },
   productRow: {
+    width: '100%',
     flexDirection: 'row',
-    gap: Spacing.SM,
-    marginBottom: Spacing.MD,
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
   productGridItem: {
-    flex: 1,
+    width: '48.5%',
+    marginBottom: 12,
   },
   bottomPadding: {
     height: 140,
