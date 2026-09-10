@@ -162,11 +162,13 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.SM,
   },
   chip: {
-    backgroundColor: Colors.CREAM,
+    backgroundColor: 'rgba(255,248,240,0.72)',
     paddingHorizontal: Spacing.MD,
     paddingVertical: Spacing.SM,
     borderRadius: Radius.CHIP,
     marginRight: Spacing.SM,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.55)',
   },
   chipSelected: {
     backgroundColor: Colors.BRAND,
@@ -221,10 +223,17 @@ const styles = StyleSheet.create({
   },
   featuredCard: {
     width: 160,
-    backgroundColor: Colors.CREAM,
+    backgroundColor: 'rgba(255,248,240,0.72)',
     borderRadius: Radius.CARD,
     padding: Spacing.MD,
     gap: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.55)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
   },
   featuredEmoji: {
     fontSize: 44,
@@ -280,6 +289,6 @@ const styles = StyleSheet.create({
     marginTop: Spacing.SM,
   },
   bottomPadding: {
-    height: 120,
+    height: 140,
   },
 });

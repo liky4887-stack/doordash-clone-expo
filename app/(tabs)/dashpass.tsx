@@ -229,6 +229,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bottomPadding: {
-    height: 120,
+    height: 140,
   },
 });

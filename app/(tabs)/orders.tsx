@@ -138,10 +138,17 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.SM,
   },
   activeOrderCard: {
-    backgroundColor: Colors.CREAM,
+    backgroundColor: 'rgba(255,248,240,0.72)',
     borderRadius: Radius.LG,
     padding: Spacing.MD,
     marginBottom: Spacing.LG,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.55)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
   },
   activeOrderHeader: {
     flexDirection: 'row',
@@ -282,6 +289,6 @@ const styles = StyleSheet.create({
     color: Colors.EMERALD_600,
   },
   bottomPadding: {
-    height: 120,
+    height: 140,
   },
 });
