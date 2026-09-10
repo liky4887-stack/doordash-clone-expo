@@ -1,7 +1,6 @@
 import { Tabs } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/colors';
 import { useCartStore } from '@/store/useCartStore';
 import MacOSDock, { DockApp } from '@/components/ui/mac-os-dock';
 import { Coffee, Receipt, Gift, ShoppingCart } from 'lucide-react-native';
@@ -24,18 +23,13 @@ function CustomTabBar({ state, navigation }: { state: any; navigation: any }) {
   };
 
   return (
-    <View
-      style={[
-        styles.tabBarContainer,
-        { paddingBottom: Math.max(insets.bottom, 8) },
-      ]}
-      pointerEvents="box-none"
-    >
+    <View style={styles.tabBarContainer} pointerEvents="box-none">
       <MacOSDock
         apps={dockApps}
         activeIndex={activeIndex}
         onAppClick={handleAppClick}
         badge={itemCount}
+        bottomInset={Math.max(insets.bottom, 0)}
         style={styles.dockFullWidth}
       />
     </View>

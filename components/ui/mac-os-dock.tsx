@@ -31,6 +31,7 @@ export interface MacOSDockProps {
   activeIndex: number;
   onAppClick: (index: number) => void;
   badge?: number;
+  bottomInset?: number;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -46,6 +47,7 @@ export default function MacOSDock({
   activeIndex,
   onAppClick,
   badge,
+  bottomInset = 0,
   style,
 }: MacOSDockProps) {
   const touchX = useSharedValue<number | null>(null);
@@ -122,7 +124,7 @@ export default function MacOSDock({
     <GestureDetector gesture={gesture}>
       <View
         onLayout={handleLayout}
-        style={[styles.dockContainer, style]}
+        style={[styles.dockContainer, { height: BASE_ICON_SIZE + PADDING * 2 + 6 + bottomInset }, style]}
       >
         <BlurView intensity={80} tint="light" style={StyleSheet.absoluteFillObject} />
         <View style={styles.dockInner}>
@@ -193,8 +195,10 @@ const styles = StyleSheet.create({
     height: BASE_ICON_SIZE + PADDING * 2 + 6,
     overflow: 'hidden',
     borderTopWidth: 1,
-    borderTopColor: Colors.LIGHT_GRAY,
-    backgroundColor: 'rgba(255,248,240,0.92)',
+    borderTopColor: 'rgba(255,255,255,0.72)',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    backgroundColor: 'rgba(255,248,240,0.78)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.08,
@@ -206,16 +210,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     justifyContent: 'center',
-    paddingHorizontal: PADDING,
+    paddingHorizontal: 0,
     paddingBottom: PADDING,
     paddingTop: PADDING,
-    gap: SPACING,
+    gap: 0,
   },
   iconWrapper: {
     alignItems: 'center',
     justifyContent: 'flex-end',
-    width: BASE_ICON_SIZE,
+    flex: 1,
     height: BASE_ICON_SIZE,
+    maxWidth: 104,
   },
   iconBox: {
     width: BASE_ICON_SIZE,
