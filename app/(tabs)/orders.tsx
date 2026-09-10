@@ -24,7 +24,6 @@ export default function OrdersScreen() {
       />
       <View style={styles.orderMeta}>
         <View style={styles.orderMetaLeft}>
-          <Text style={styles.orderStore} numberOfLines={1}>{item.storeName}</Text>
           <Text style={styles.orderDate}>{item.orderDate} · Qty {item.quantity}</Text>
         </View>
         <View style={styles.statusBadge}>
@@ -47,11 +46,11 @@ export default function OrdersScreen() {
           <View style={styles.activeOrderCard}>
             <View style={styles.activeOrderHeader}>
               <View style={styles.activeOrderIcon}>
-                <Ionicons name="restaurant-outline" size={22} color={Colors.WHITE} />
+                <Ionicons name="cafe-outline" size={22} color={Colors.WHITE} />
               </View>
               <View style={styles.activeOrderInfo}>
-                <Text style={styles.activeOrderStore}>{activeOrder.storeName}</Text>
-                <Text style={styles.activeOrderArrival}>Arriving by {activeOrder.arrivalTime}</Text>
+                <Text style={styles.activeOrderLabel}>Ready for pickup</Text>
+                <Text style={styles.activeOrderArrival}>Ready by {activeOrder.arrivalTime}</Text>
               </View>
               <TouchableOpacity style={styles.trackBtn} activeOpacity={0.7}>
                 <Text style={styles.trackBtnText}>Track</Text>
@@ -64,8 +63,8 @@ export default function OrdersScreen() {
               </View>
               <View style={styles.progressLabels}>
                 <Text style={styles.progressLabelActive}>Preparing</Text>
-                <Text style={styles.progressLabel}>On the way</Text>
-                <Text style={styles.progressLabel}>Delivered</Text>
+                <Text style={styles.progressLabel}>Ready</Text>
+                <Text style={styles.progressLabel}>Picked up</Text>
               </View>
             </View>
 
@@ -121,7 +120,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: Colors.BLACK,
+    color: Colors.BRAND,
   },
   headerSubtitle: {
     fontSize: 14,
@@ -139,7 +138,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.SM,
   },
   activeOrderCard: {
-    backgroundColor: Colors.GRAY,
+    backgroundColor: Colors.CREAM,
     borderRadius: Radius.LG,
     padding: Spacing.MD,
     marginBottom: Spacing.LG,
@@ -161,7 +160,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: Spacing.MD,
   },
-  activeOrderStore: {
+  activeOrderLabel: {
     fontSize: 15,
     fontWeight: '700',
     color: Colors.BLACK,
@@ -172,7 +171,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   trackBtn: {
-    backgroundColor: Colors.BLACK,
+    backgroundColor: Colors.BRAND,
     paddingHorizontal: Spacing.MD,
     paddingVertical: Spacing.SM,
     borderRadius: Radius.CHIP,
@@ -267,18 +266,12 @@ const styles = StyleSheet.create({
   orderMetaLeft: {
     flex: 1,
   },
-  orderStore: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.BLACK,
-  },
   orderDate: {
     fontSize: 11,
     color: Colors.DARK_GRAY,
-    marginTop: 2,
   },
   statusBadge: {
-    backgroundColor: Colors.GREEN + '20',
+    backgroundColor: Colors.EMERALD_500 + '20',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
@@ -286,7 +279,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 10,
     fontWeight: '600',
-    color: Colors.GREEN,
+    color: Colors.EMERALD_600,
   },
   bottomPadding: {
     height: Spacing.XL * 2,

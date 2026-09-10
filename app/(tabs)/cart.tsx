@@ -14,8 +14,8 @@ export default function CartScreen() {
   const items = useCartStore((state) => state.items);
   const itemCount = items.length;
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const deliveryFee = itemCount > 0 ? 2.99 : 0;
-  const total = subtotal + deliveryFee;
+  const tax = subtotal * 0.08;
+  const total = subtotal + tax;
 
   const renderPick = (item: CartItem) => (
     <TouchableOpacity
@@ -37,10 +37,10 @@ export default function CartScreen() {
       <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.emptyContainer}>
           <View style={styles.emptyIcon}>
-            <Ionicons name="cart-outline" size={48} color={Colors.DARK_GRAY} />
+            <Ionicons name="cafe-outline" size={48} color={Colors.DARK_GRAY} />
           </View>
           <Text style={styles.emptyTitle}>Your cart is empty</Text>
-          <Text style={styles.emptySubtitle}>Add items from stores to get started</Text>
+          <Text style={styles.emptySubtitle}>Add drinks and treats from our menu to get started</Text>
         </View>
       </SafeAreaView>
     );
@@ -66,7 +66,7 @@ export default function CartScreen() {
         </View>
 
         <View style={styles.picksSection}>
-          <Text style={styles.sectionTitle}>Our Picks for You</Text>
+          <Text style={styles.sectionTitle}>You Might Also Like</Text>
           <View style={styles.picksGrid}>
             {ourPicks.map((item, index) => {
               if (index % 2 !== 0) return null;
@@ -87,8 +87,8 @@ export default function CartScreen() {
             <Text style={styles.footerValue}>${subtotal.toFixed(2)}</Text>
           </View>
           <View style={styles.footerRow}>
-            <Text style={styles.footerLabel}>Delivery fee</Text>
-            <Text style={styles.footerValue}>${deliveryFee.toFixed(2)}</Text>
+            <Text style={styles.footerLabel}>Tax (8%)</Text>
+            <Text style={styles.footerValue}>${tax.toFixed(2)}</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.footerRow}>
@@ -96,7 +96,7 @@ export default function CartScreen() {
             <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
           </View>
           <TouchableOpacity style={styles.checkoutBtn} activeOpacity={0.85}>
-            <Text style={styles.checkoutBtnText}>Proceed to Checkout</Text>
+            <Text style={styles.checkoutBtnText}>Place Order</Text>
             <Ionicons name="arrow-forward" size={20} color={Colors.WHITE} />
           </TouchableOpacity>
         </View>
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: Colors.BLACK,
+    color: Colors.BRAND,
   },
   headerSubtitle: {
     fontSize: 14,
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   },
   pickCard: {
     flex: 1,
-    backgroundColor: Colors.GRAY,
+    backgroundColor: Colors.CREAM,
     borderRadius: Radius.CARD,
     padding: Spacing.MD,
     alignItems: 'center',
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   pickPrice: {
     fontSize: 14,
     fontWeight: '700',
-    color: Colors.PRIMARY,
+    color: Colors.BRAND,
   },
   addPickBtn: {
     position: 'absolute',
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: Colors.PRIMARY,
+    backgroundColor: Colors.BRAND,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -223,13 +223,13 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: Colors.BLACK,
+    color: Colors.BRAND,
   },
   checkoutBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.PRIMARY,
+    backgroundColor: Colors.BRAND,
     borderRadius: Radius.CHIP,
     paddingVertical: Spacing.MD + 2,
     marginTop: Spacing.LG,
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: Colors.GRAY,
+    backgroundColor: Colors.CREAM,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: Spacing.LG,
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: Colors.BLACK,
+    color: Colors.BRAND,
     marginBottom: 6,
   },
   emptySubtitle: {

@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { cartItems } from '@/constants/mockData';
 
 export interface CartItem {
   id: string;
@@ -17,15 +16,11 @@ interface CartState {
   decrement: (id: string) => void;
   getTotal: () => number;
   getItemCount: () => number;
+  clearCart: () => void;
 }
 
-const initialItems: CartItem[] = cartItems.map((item) => ({
-  ...item,
-  quantity: 1,
-}));
-
 export const useCartStore = create<CartState>((set, get) => ({
-  items: initialItems,
+  items: [],
 
   addItem: (item) =>
     set((state) => {
@@ -65,4 +60,6 @@ export const useCartStore = create<CartState>((set, get) => ({
     get().items.reduce((sum, item) => sum + item.price * item.quantity, 0),
 
   getItemCount: () => get().items.length,
+
+  clearCart: () => set({ items: [] }),
 }));

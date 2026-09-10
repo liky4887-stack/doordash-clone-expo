@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Radius } from '@/constants/colors';
-import { categories, products, Product } from '@/constants/mockData';
+import { categories, products, featuredProducts, Product } from '@/constants/mockData';
 import { useCartStore } from '@/store/useCartStore';
 import LocationHeader from '@/components/LocationHeader';
 import SearchBar from '@/components/SearchBar';
@@ -12,7 +12,16 @@ import ProductCard from '@/components/ui/product-card';
 
 export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const addItem = useCartStore((state) => state.addItem);
+
+  const filtered = products.filter((p) => {
+    const matchesCategory = !selectedCategory || p.categoryId === selectedCategory;
+    const matchesSearch = !searchQuery ||
+      p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.description ?? '').toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   const renderProduct = (item: Product) => (
     <ProductCard
@@ -32,7 +41,7 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <LocationHeader />
-        <SearchBar />
+        <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
 
         <ScrollView
           horizontal
@@ -40,6 +49,13 @@ export default function HomeScreen() {
           style={styles.categoriesScroll}
           contentContainerStyle={styles.categoriesContent}
         >
+          <TouchableOpacity
+            style={[styles.chip, !selectedCategory && styles.chipSelected]}
+            onPress={() => setSelectedCategory(null)}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.chipLabel, !selectedCategory && styles.chipLabelSelected]}>All</Text>
+          </TouchableOpacity>
           {categories.map((cat) => (
             <CategoryChip
               key={cat.id}
@@ -52,49 +68,76 @@ export default function HomeScreen() {
           ))}
         </ScrollView>
 
-        <View style={styles.actionsRow}>
-          <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7}>
-            <View style={styles.actionIconActive}>
-              <Ionicons name="trophy-outline" size={16} color={Colors.WHITE} />
-            </View>
-            <Text style={styles.actionLabelActive}>DashPass</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7}>
-            <Ionicons name="bag-outline" size={16} color={Colors.BLACK} />
-            <Text style={styles.actionLabel}>Pickup</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7}>
-            <Ionicons name="star-outline" size={16} color={Colors.BLACK} />
-            <Text style={styles.actionLabel}>Ratings</Text>
-          </TouchableOpacity>
-        </View>
+        {!selectedCategory && !searchQuery && (
+          <View style={styles.heroSection}>
+            <Text style={styles.heroTitle}>Good morning! ☕</Text>
+            <Text style={styles.heroSubtitle}>
+              Start your day with a perfect brew
+            </Text>
+          </View>
+        )}
 
-        <View style={styles.heroSection}>
-          <Text style={styles.heroTitle}>Fresh picks, delivered fast</Text>
-          <Text style={styles.heroSubtitle}>
-            Explore top-rated dishes from restaurants near you
-          </Text>
-        </View>
+        {!selectedCategory && !searchQuery && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Featured Drinks</Text>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.featuredContent}
+            >
+              {featuredProducts.map((item) => (
+                <View key={item.id} style={styles.featuredCard}>
+                  <Text style={styles.featuredEmoji}>{item.emoji}</Text>
+                  <Text style={styles.featuredTitle} numberOfLines={1}>{item.title}</Text>
+                  <Text style={styles.featuredDesc} numberOfLines={2}>{item.description}</Text>
+                  <View style={styles.featuredBottom}>
+                    <Text style={styles.featuredPrice}>${item.price.toFixed(2)}</Text>
+                    <TouchableOpacity
+                      style={styles.featuredAdd}
+                      onPress={() => addItem({ id: item.id, name: item.title, price: item.price, image: item.emoji })}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="add" size={18} color={Colors.WHITE} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        )}
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Popular Near You</Text>
-            <TouchableOpacity activeOpacity={0.7}>
-              <Text style={styles.seeAll}>See all</Text>
-            </TouchableOpacity>
+            <Text style={styles.sectionTitle}>
+              {selectedCategory
+                ? categories.find((c) => c.id === selectedCategory)?.label ?? 'Menu'
+                : searchQuery
+                  ? 'Search Results'
+                  : 'Full Menu'}
+            </Text>
+            <Text style={styles.itemCount}>{filtered.length} items</Text>
           </View>
-          <View style={styles.productGrid}>
-            {products.map((item, index) => {
-              if (index % 2 !== 0) return null;
-              const nextItem = products[index + 1];
-              return (
-                <View key={item.id} style={styles.productRow}>
-                  <View style={styles.productGridItem}>{renderProduct(item)}</View>
-                  <View style={styles.productGridItem}>{nextItem ? renderProduct(nextItem) : null}</View>
-                </View>
-              );
-            })}
-          </View>
+          {filtered.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Ionicons name="search-outline" size={40} color={Colors.LIGHT_GRAY} />
+              <Text style={styles.emptyText}>No items found</Text>
+            </View>
+          ) : (
+            <View style={styles.productGrid}>
+              {filtered.map((item, index) => {
+                if (index % 2 !== 0) return null;
+                const nextItem = filtered[index + 1];
+                return (
+                  <View key={item.id} style={styles.productRow}>
+                    <View style={styles.productGridItem}>{renderProduct(item)}</View>
+                    <View style={styles.productGridItem}>{nextItem ? renderProduct(nextItem) : null}</View>
+                  </View>
+                );
+              })}
+            </View>
+          )}
         </View>
 
         <View style={styles.bottomPadding} />
@@ -118,47 +161,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.LG,
     paddingVertical: Spacing.SM,
   },
-  actionsRow: {
-    flexDirection: 'row',
-    paddingHorizontal: Spacing.LG,
-    paddingVertical: Spacing.SM,
-    gap: Spacing.SM,
-  },
-  actionBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.GRAY,
+  chip: {
+    backgroundColor: Colors.CREAM,
     paddingHorizontal: Spacing.MD,
     paddingVertical: Spacing.SM,
     borderRadius: Radius.CHIP,
-    gap: 6,
+    marginRight: Spacing.SM,
   },
-  actionIconActive: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+  chipSelected: {
     backgroundColor: Colors.BRAND,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  actionLabel: {
-    fontSize: 13,
+  chipLabel: {
+    fontSize: 14,
     fontWeight: '600',
     color: Colors.BLACK,
   },
-  actionLabelActive: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.BRAND,
+  chipLabelSelected: {
+    color: Colors.WHITE,
   },
   heroSection: {
     paddingHorizontal: Spacing.LG,
     paddingVertical: Spacing.MD,
   },
   heroTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',
-    color: Colors.BLACK,
+    color: Colors.BRAND,
     marginBottom: 4,
   },
   heroSubtitle: {
@@ -182,10 +210,54 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.BLACK,
   },
-  seeAll: {
-    fontSize: 14,
-    fontWeight: '600',
+  itemCount: {
+    fontSize: 13,
+    color: Colors.DARK_GRAY,
+    fontWeight: '500',
+  },
+  featuredContent: {
+    paddingHorizontal: Spacing.LG,
+    gap: Spacing.MD,
+  },
+  featuredCard: {
+    width: 160,
+    backgroundColor: Colors.CREAM,
+    borderRadius: Radius.CARD,
+    padding: Spacing.MD,
+    gap: 6,
+  },
+  featuredEmoji: {
+    fontSize: 44,
+    textAlign: 'center',
+  },
+  featuredTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: Colors.BLACK,
+  },
+  featuredDesc: {
+    fontSize: 12,
+    color: Colors.DARK_GRAY,
+    lineHeight: 16,
+  },
+  featuredBottom: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 4,
+  },
+  featuredPrice: {
+    fontSize: 17,
+    fontWeight: '800',
     color: Colors.BRAND,
+  },
+  featuredAdd: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.BRAND,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   productGrid: {
     paddingHorizontal: Spacing.LG,
@@ -197,6 +269,15 @@ const styles = StyleSheet.create({
   },
   productGridItem: {
     flex: 1,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: Spacing.XL * 2,
+  },
+  emptyText: {
+    fontSize: 15,
+    color: Colors.DARK_GRAY,
+    marginTop: Spacing.SM,
   },
   bottomPadding: {
     height: Spacing.XL * 2,

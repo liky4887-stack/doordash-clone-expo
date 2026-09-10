@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Spacing, Radius } from '@/constants/colors';
-import { dashpassProducts, Product } from '@/constants/mockData';
+import { rewardsProducts, Product } from '@/constants/mockData';
 import { useCartStore } from '@/store/useCartStore';
 import LocationHeader from '@/components/LocationHeader';
 import SearchBar from '@/components/SearchBar';
@@ -30,60 +30,54 @@ export default function DashPassScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <LinearGradient
-          colors={['#1A1A1A', '#2D2D2D']}
+          colors={['#3B2417', '#6F4E37']}
           style={styles.heroCard}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
           <View style={styles.heroBadge}>
-            <Ionicons name="trophy" size={20} color={Colors.YELLOW} />
-            <Text style={styles.heroBadgeText}>DASHPASS</Text>
+            <Ionicons name="gift" size={20} color={Colors.GOLD} />
+            <Text style={styles.heroBadgeText}>BREW REWARDS</Text>
           </View>
 
-          <Text style={styles.heroTitle}>Save on every order</Text>
+          <Text style={styles.heroTitle}>Earn points with every cup</Text>
           <Text style={styles.heroSubtitle}>
-            Get $0 delivery fees and reduced service fees on eligible orders over $12
+            Collect points on every order and redeem them for free drinks and treats
           </Text>
 
-          <TouchableOpacity style={styles.heroBtn} activeOpacity={0.85}>
-            <Text style={styles.heroBtnText}>Try DashPass Free</Text>
-          </TouchableOpacity>
-
-          <View style={styles.heroStatsRow}>
-            <View style={styles.heroStat}>
-              <Text style={styles.heroStatValue}>$0</Text>
-              <Text style={styles.heroStatLabel}>Delivery fees</Text>
+          <View style={styles.pointsRow}>
+            <View style={styles.pointsCircle}>
+              <Text style={styles.pointsValue}>320</Text>
+              <Text style={styles.pointsLabel}>points</Text>
             </View>
-            <View style={styles.heroStatDivider} />
-            <View style={styles.heroStat}>
-              <Text style={styles.heroStatValue}>10%</Text>
-              <Text style={styles.heroStatLabel}>Off orders</Text>
-            </View>
-            <View style={styles.heroStatDivider} />
-            <View style={styles.heroStat}>
-              <Text style={styles.heroStatValue}>5%</Text>
-              <Text style={styles.heroStatLabel}>Cash back</Text>
+            <View style={styles.pointsInfo}>
+              <Text style={styles.pointsNext}>Next reward at 400 points</Text>
+              <View style={styles.pointsBar}>
+                <View style={styles.pointsBarFill} />
+              </View>
+              <Text style={styles.pointsRemaining}>80 points to go</Text>
             </View>
           </View>
+
+          <TouchableOpacity style={styles.heroBtn} activeOpacity={0.85}>
+            <Text style={styles.heroBtnText}>How Rewards Work</Text>
+          </TouchableOpacity>
         </LinearGradient>
 
-        <LocationHeader />
-        <SearchBar placeholder="Search DashPass stores" />
+        <LocationHeader address="Brew & Bean Cafe" />
+        <SearchBar placeholder="Search rewards..." />
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>DashPass Exclusives</Text>
-            <TouchableOpacity activeOpacity={0.7}>
-              <Text style={styles.seeAll}>See all</Text>
-            </TouchableOpacity>
+            <Text style={styles.sectionTitle}>Redeem Your Points</Text>
           </View>
           <Text style={styles.sectionSubtitle}>
-            Member-only prices on top dishes
+            Member-only rewards and free items
           </Text>
           <View style={styles.productGrid}>
-            {dashpassProducts.map((item, index) => {
+            {rewardsProducts.map((item, index) => {
               if (index % 2 !== 0) return null;
-              const nextItem = dashpassProducts[index + 1];
+              const nextItem = rewardsProducts[index + 1];
               return (
                 <View key={item.id} style={styles.productRow}>
                   <View style={styles.productGridItem}>{renderProduct(item)}</View>
@@ -121,7 +115,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.MD,
   },
   heroBadgeText: {
-    color: Colors.YELLOW,
+    color: Colors.GOLD,
     fontSize: 14,
     fontWeight: '800',
     letterSpacing: 1,
@@ -135,45 +129,72 @@ const styles = StyleSheet.create({
   },
   heroSubtitle: {
     fontSize: 14,
-    color: '#CCCCCC',
+    color: '#D4C4B5',
     lineHeight: 20,
     marginBottom: Spacing.LG,
+  },
+  pointsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.LG,
+  },
+  pointsCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: 'rgba(201,169,110,0.15)',
+    borderWidth: 2,
+    borderColor: Colors.GOLD,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: Spacing.MD,
+  },
+  pointsValue: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: Colors.GOLD,
+  },
+  pointsLabel: {
+    fontSize: 10,
+    color: '#D4C4B5',
+    marginTop: 1,
+  },
+  pointsInfo: {
+    flex: 1,
+  },
+  pointsNext: {
+    fontSize: 12,
+    color: '#D4C4B5',
+    marginBottom: 6,
+  },
+  pointsBar: {
+    height: 6,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  pointsBarFill: {
+    width: '80%',
+    height: '100%',
+    backgroundColor: Colors.GOLD,
+    borderRadius: 3,
+  },
+  pointsRemaining: {
+    fontSize: 11,
+    color: Colors.GOLD,
+    marginTop: 4,
+    fontWeight: '600',
   },
   heroBtn: {
     backgroundColor: Colors.BRAND,
     paddingVertical: Spacing.MD,
     borderRadius: Radius.CHIP,
     alignItems: 'center',
-    marginBottom: Spacing.LG,
   },
   heroBtnText: {
     color: Colors.WHITE,
     fontSize: 16,
     fontWeight: '700',
-  },
-  heroStatsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  heroStat: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  heroStatValue: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: Colors.YELLOW,
-  },
-  heroStatLabel: {
-    fontSize: 12,
-    color: '#AAAAAA',
-    marginTop: 2,
-  },
-  heroStatDivider: {
-    width: 1,
-    height: 30,
-    backgroundColor: '#333333',
   },
   section: {
     paddingTop: Spacing.MD,
@@ -189,11 +210,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: Colors.BLACK,
-  },
-  seeAll: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.BRAND,
   },
   sectionSubtitle: {
     fontSize: 13,

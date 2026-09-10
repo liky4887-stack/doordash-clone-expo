@@ -1,39 +1,23 @@
-/**
- * LocationHeader - Premium location and profile header
- * Features: Design tokens integration, accessibility, consistent spacing
- */
-
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import colors from "@/src/design-tokens/colors";
-import typography from "@/src/design-tokens/typography";
-import { space } from "@/src/design-tokens/spacing";
+import { Colors, Spacing } from '@/constants/colors';
 
 interface LocationHeaderProps {
   address?: string;
 }
 
-export default function LocationHeader({ address = '283 Hayes St' }: LocationHeaderProps) {
+export default function LocationHeader({ address = 'Brew & Bean Cafe' }: LocationHeaderProps) {
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.locationBtn}
-        accessibilityRole="button"
-        accessibilityLabel={`Change delivery address: ${address}`}
-      >
-        <Text style={styles.label}>Delivery to</Text>
+      <TouchableOpacity style={styles.locationBtn} activeOpacity={0.7}>
+        <Text style={styles.label}>Welcome to</Text>
         <View style={styles.addressRow}>
-          <Text style={styles.address}>{address}</Text>
-          <Ionicons name="chevron-down" size={16} color={colors.neutral[600]} />
+          <Text style={styles.address} numberOfLines={1}>{address}</Text>
+          <Ionicons name="chevron-down" size={18} color={Colors.BRAND} />
         </View>
       </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.profileBtn}
-        accessibilityRole="button"
-        accessibilityLabel="Open profile"
-      >
-        <Ionicons name="person-circle-outline" size={32} color={colors.neutral[700]} />
+      <TouchableOpacity style={styles.profileBtn} activeOpacity={0.7}>
+        <Ionicons name="person-circle-outline" size={32} color={Colors.BRAND} />
       </TouchableOpacity>
     </View>
   );
@@ -44,16 +28,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: space.lg,
-    paddingVertical: space.sm,
+    paddingHorizontal: Spacing.LG,
+    paddingVertical: Spacing.SM,
   },
   locationBtn: {
     flex: 1,
   },
   label: {
-    fontSize: typography.fontSize.xs,
-    color: colors.neutral[500],
-    fontWeight: typography.fontWeight.medium,
+    fontSize: 12,
+    color: Colors.DARK_GRAY,
+    fontWeight: '500',
   },
   addressRow: {
     flexDirection: 'row',
@@ -61,9 +45,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   address: {
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.bold,
-    color: colors.neutral[900],
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.BRAND,
     marginRight: 4,
   },
   profileBtn: {

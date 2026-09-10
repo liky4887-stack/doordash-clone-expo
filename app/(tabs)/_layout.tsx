@@ -10,7 +10,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.PRIMARY,
+        tabBarActiveTintColor: Colors.BRAND,
         tabBarInactiveTintColor: Colors.DARK_GRAY,
         tabBarLabelStyle: {
           fontSize: 12,
@@ -27,9 +27,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Menu',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
+            <Ionicons name="cafe-outline" size={size} color={color} />
           ),
         }}
       />
@@ -45,9 +45,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="dashpass"
         options={{
-          title: 'DashPass',
+          title: 'Rewards',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="trophy-outline" size={size} color={color} />
+            <Ionicons name="gift-outline" size={size} color={color} />
           ),
         }}
       />

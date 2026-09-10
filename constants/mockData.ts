@@ -1,26 +1,3 @@
-export interface Store {
-  id: string;
-  name: string;
-  distance: string;
-  time: string;
-  feeText: string;
-  rating: string;
-  reviews: number;
-  emoji: string;
-  tag?: string;
-}
-
-export interface Deal {
-  id: string;
-  title: string;
-  subtitle: string;
-  storeName: string;
-  distance: string;
-  time: string;
-  rating: string;
-  emoji: string;
-}
-
 export interface CartItem {
   id: string;
   name: string;
@@ -35,20 +12,6 @@ export interface Category {
   emoji: string;
 }
 
-export interface AddOn {
-  id: string;
-  name: string;
-  emoji: string;
-  extraTime: string;
-  price: string;
-}
-
-export interface HealthItem {
-  id: string;
-  name: string;
-  emoji: string;
-}
-
 export interface Product {
   id: string;
   title: string;
@@ -56,82 +19,75 @@ export interface Product {
   originalPrice?: number;
   rating?: number;
   badge?: string;
-  image?: string;
   emoji: string;
+  categoryId: string;
+  description?: string;
 }
 
 export const categories: Category[] = [
-  { id: '1', label: 'Pizza', emoji: '🍕' },
-  { id: '2', label: 'Burrito', emoji: '🌯' },
-  { id: '3', label: 'Bowls', emoji: '🥗' },
-  { id: '4', label: 'Bakery', emoji: '🥐' },
-  { id: '5', label: 'Smoothie', emoji: '🥤' },
-  { id: '6', label: 'Chocolate', emoji: '🍫' },
-];
-
-export const stores: Store[] = [
-  { id: 's1', name: 'Tony Pizza Napoletana', distance: '0.5 mi', time: '15-25 min', feeText: 'Free delivery', rating: '4.8', reviews: 1200, emoji: '🍕', tag: 'DashPass' },
-  { id: 's2', name: 'Burrito Box', distance: '0.8 mi', time: '20-30 min', feeText: '$2.99 delivery', rating: '4.6', reviews: 850, emoji: '🌯' },
-  { id: 's3', name: 'Green Bowl Co.', distance: '1.2 mi', time: '25-35 min', feeText: 'Free delivery', rating: '4.9', reviews: 2100, emoji: '🥗', tag: 'DashPass' },
-  { id: 's4', name: 'Sweet Tooth Bakery', distance: '0.3 mi', time: '10-20 min', feeText: '$1.99 delivery', rating: '4.7', reviews: 640, emoji: '🥐' },
-  { id: 's5', name: 'Smoothie Station', distance: '1.5 mi', time: '20-30 min', feeText: 'Free delivery', rating: '4.5', reviews: 430, emoji: '🥤', tag: 'DashPass' },
-  { id: 's6', name: 'Choco Lovers', distance: '0.7 mi', time: '15-25 min', feeText: '$3.49 delivery', rating: '4.4', reviews: 320, emoji: '🍫' },
-];
-
-export const deals: Deal[] = [
-  { id: 'd1', title: '20% Off Your First Order', subtitle: 'New customers only', storeName: 'Tony Pizza Napoletana', distance: '0.5 mi', time: '15-25 min', rating: '4.8', emoji: '🍕' },
-  { id: 'd2', title: 'Buy 1 Get 1 Free', subtitle: 'On all smoothies', storeName: 'Smoothie Station', distance: '1.5 mi', time: '20-30 min', rating: '4.5', emoji: '🥤' },
-  { id: 'd3', title: 'Free Dessert with $25+', subtitle: 'Limited time offer', storeName: 'Green Bowl Co.', distance: '1.2 mi', time: '25-35 min', rating: '4.9', emoji: '🥗' },
-];
-
-export const cartItems: Omit<CartItem, 'quantity'>[] = [
-  { id: 'c1', name: 'Stanley Tumbler 40oz', price: 35.0, image: '🥤' },
-  { id: 'c2', name: 'Nike Air Max Shoes', price: 129.99, image: '👟' },
-  { id: 'c3', name: 'Titleist Pro V1 Golf Balls', price: 49.99, image: '⛳' },
-];
-
-export const ourPicks: CartItem[] = [
-  { id: 'p1', name: 'Margherita Pizza', price: 14.99, quantity: 0, image: '🍕' },
-  { id: 'p2', name: 'Vegan Buddha Bowl', price: 12.49, quantity: 0, image: '🥗' },
-  { id: 'p3', name: 'Chocolate Lava Cake', price: 7.99, quantity: 0, image: '🍫' },
-  { id: 'p4', name: 'Strawberry Smoothie', price: 6.49, quantity: 0, image: '🥤' },
-];
-
-export const addOns: AddOn[] = [
-  { id: 'a1', name: 'Extra Avocado', emoji: '🥑', extraTime: '+8 min', price: '$2.50' },
-  { id: 'a2', name: 'Garlic Bread', emoji: '🥖', extraTime: '+8 min', price: '$4.99' },
-  { id: 'a3', name: 'Side of Fries', emoji: '🍟', extraTime: '+8 min', price: '$3.49' },
-];
-
-export const healthItems: HealthItem[] = [
-  { id: 'h1', name: 'Vitamins', emoji: '💊' },
-  { id: 'h2', name: 'Hand Sanitizer', emoji: '🧴' },
-  { id: 'h3', name: 'Bandages', emoji: '🩹' },
-  { id: 'h4', name: 'Thermometer', emoji: '🌡️' },
-  { id: 'h5', name: 'Face Masks', emoji: '😷' },
-  { id: 'h6', name: 'Cough Drops', emoji: '🍬' },
+  { id: 'hot', label: 'Hot Drinks', emoji: '☕' },
+  { id: 'cold', label: 'Cold Drinks', emoji: '🧊' },
+  { id: 'mojito', label: 'Mojito', emoji: '🍹' },
+  { id: 'smoothie', label: 'Smoothie', emoji: '🥤' },
+  { id: 'sweets', label: 'Sweets', emoji: '🍰' },
 ];
 
 export const products: Product[] = [
-  { id: 'pr1', title: 'Margherita Pizza', price: 14.99, originalPrice: 22.99, rating: 4.5, badge: 'Sale', image: '🍕', emoji: '🍕' },
-  { id: 'pr2', title: 'Vegan Buddha Bowl', price: 12.49, rating: 5, badge: 'New', image: '🥗', emoji: '🥗' },
-  { id: 'pr3', title: 'Chocolate Lava Cake', price: 7.99, originalPrice: 11.99, rating: 4.5, badge: 'Sale', image: '🍫', emoji: '🍫' },
-  { id: 'pr4', title: 'Strawberry Smoothie', price: 6.49, rating: 5, badge: 'New', image: '🥤', emoji: '🥤' },
-  { id: 'pr5', title: 'Pepperoni Pizza', price: 16.99, originalPrice: 24.99, rating: 4.5, badge: 'Sale', image: '🍕', emoji: '🍕' },
-  { id: 'pr6', title: 'Chicken Burrito', price: 10.99, rating: 4, badge: 'New', image: '🌯', emoji: '🌯' },
-  { id: 'pr7', title: 'Avocado Toast', price: 8.49, originalPrice: 12.99, rating: 4.5, badge: 'Sale', image: '🥑', emoji: '🥑' },
-  { id: 'pr8', title: 'Fresh Lemonade', price: 4.99, rating: 4, image: '🍋', emoji: '🍋' },
-  // extra products per requirement (>=6 items, already have 8)
-  { id: 'pr9', title: 'Gourmet Burger', price: 13.99, originalPrice: 19.99, rating: 4, badge: 'Sale', image: '🍔', emoji: '🍔' },
-  { id: 'pr10', title: 'Pasta Alfredo', price: 11.99, rating: 4, badge: 'New', image: '🍝', emoji: '🍝' },
-];
-;
+  // Hot Drinks
+  { id: 'h1', title: 'Espresso', price: 2.50, rating: 5, badge: 'Popular', emoji: '☕', categoryId: 'hot', description: 'Rich single-origin shot' },
+  { id: 'h2', title: 'Cappuccino', price: 3.75, rating: 5, emoji: '☕', categoryId: 'hot', description: 'Espresso with steamed milk foam' },
+  { id: 'h3', title: 'Caffè Latte', price: 4.25, rating: 4.5, emoji: '☕', categoryId: 'hot', description: 'Smooth espresso with silky milk' },
+  { id: 'h4', title: 'Flat White', price: 4.00, rating: 5, badge: 'New', emoji: '☕', categoryId: 'hot', description: 'Double ristretto with microfoam' },
+  { id: 'h5', title: 'Turkish Coffee', price: 3.50, rating: 4.5, emoji: '☕', categoryId: 'hot', description: 'Traditional finely ground brew' },
+  { id: 'h6', title: 'Hot Chocolate', price: 3.95, rating: 4.5, emoji: '🍫', categoryId: 'hot', description: 'Belgian chocolate with whipped cream' },
+  { id: 'h7', title: 'Matcha Latte', price: 4.50, rating: 5, badge: 'New', emoji: '🍵', categoryId: 'hot', description: 'Ceremonial grade matcha with milk' },
+  { id: 'h8', title: 'Chai Latte', price: 4.25, rating: 4.5, emoji: '🫖', categoryId: 'hot', description: 'Spiced black tea with steamed milk' },
 
-export const dashpassProducts: Product[] = [
-  { id: 'dp1', title: 'Premium Pizza Combo', price: 18.99, originalPrice: 28.99, rating: 5, badge: 'DashPass', emoji: '🍕' },
-  { id: 'dp2', title: 'Healthy Bowl Duo', price: 15.99, originalPrice: 24.99, rating: 4.5, badge: 'DashPass', emoji: '🥗' },
-  { id: 'dp3', title: 'Smoothie Pack x3', price: 12.99, originalPrice: 19.99, rating: 4.5, badge: 'DashPass', emoji: '🥤' },
-  { id: 'dp4', title: 'Dessert Sampler', price: 9.99, originalPrice: 16.99, rating: 5, badge: 'DashPass', emoji: '🍫' },
+  // Cold Drinks
+  { id: 'c1', title: 'Iced Americano', price: 3.25, rating: 4.5, emoji: '🧊', categoryId: 'cold', description: 'Chilled espresso over ice' },
+  { id: 'c2', title: 'Iced Latte', price: 4.50, rating: 5, badge: 'Popular', emoji: '🧊', categoryId: 'cold', description: 'Espresso with cold milk and ice' },
+  { id: 'c3', title: 'Cold Brew', price: 4.75, rating: 5, badge: 'Popular', emoji: '🧊', categoryId: 'cold', description: '18-hour steeped smooth brew' },
+  { id: 'c4', title: 'Iced Caramel Macchiato', price: 5.25, originalPrice: 6.50, rating: 5, badge: 'Sale', emoji: '🧊', categoryId: 'cold', description: 'Vanilla, milk, espresso, caramel' },
+  { id: 'c5', title: 'Nitro Cold Brew', price: 5.50, rating: 4.5, badge: 'New', emoji: '🧊', categoryId: 'cold', description: 'Nitrogen-infused creamy cold brew' },
+  { id: 'c6', title: 'Iced Mocha', price: 4.95, rating: 4.5, emoji: '🧊', categoryId: 'cold', description: 'Chocolate espresso over ice' },
+
+  // Mojito
+  { id: 'm1', title: 'Classic Mint Mojito', price: 5.50, rating: 5, badge: 'Popular', emoji: '🍹', categoryId: 'mojito', description: 'Fresh mint, lime, soda' },
+  { id: 'm2', title: 'Strawberry Mojito', price: 6.25, rating: 5, badge: 'New', emoji: '🍹', categoryId: 'mojito', description: 'Muddled strawberries with mint' },
+  { id: 'm3', title: 'Passion Fruit Mojito', price: 6.50, originalPrice: 7.99, rating: 4.5, badge: 'Sale', emoji: '🍹', categoryId: 'mojito', description: 'Tropical passion fruit and mint' },
+  { id: 'm4', title: 'Blueberry Mojito', price: 6.25, rating: 4.5, emoji: '🍹', categoryId: 'mojito', description: 'Fresh blueberries with lime' },
+  { id: 'm5', title: 'Watermelon Mojito', price: 6.00, rating: 5, emoji: '🍹', categoryId: 'mojito', description: 'Refreshing watermelon and mint' },
+  { id: 'm6', title: 'Mango Mojito', price: 6.50, rating: 5, badge: 'New', emoji: '🍹', categoryId: 'mojito', description: 'Sweet mango with fresh mint' },
+
+  // Smoothie
+  { id: 's1', title: 'Strawberry Banana Smoothie', price: 5.95, rating: 5, badge: 'Popular', emoji: '🥤', categoryId: 'smoothie', description: 'Fresh fruit blended with yogurt' },
+  { id: 's2', title: 'Tropical Mango Smoothie', price: 6.25, rating: 5, emoji: '🥤', categoryId: 'smoothie', description: 'Mango, pineapple, coconut milk' },
+  { id: 's3', title: 'Berry Blast Smoothie', price: 6.50, originalPrice: 7.99, rating: 4.5, badge: 'Sale', emoji: '🥤', categoryId: 'smoothie', description: 'Mixed berries with almond milk' },
+  { id: 's4', title: 'Green Detox Smoothie', price: 6.95, rating: 4.5, badge: 'New', emoji: '🥤', categoryId: 'smoothie', description: 'Spinach, kale, apple, ginger' },
+  { id: 's5', title: 'Avocado Smoothie', price: 6.50, rating: 5, emoji: '🥤', categoryId: 'smoothie', description: 'Creamy avocado with honey' },
+  { id: 's6', title: 'Peach Smoothie', price: 5.95, rating: 4.5, emoji: '🥤', categoryId: 'smoothie', description: 'Fresh peaches with vanilla yogurt' },
+
+  // Sweets
+  { id: 'sw1', title: 'Chocolate Lava Cake', price: 6.50, rating: 5, badge: 'Popular', emoji: '🍰', categoryId: 'sweets', description: 'Warm molten chocolate center' },
+  { id: 'sw2', title: 'New York Cheesecake', price: 5.95, rating: 5, emoji: '🍰', categoryId: 'sweets', description: 'Classic creamy cheesecake' },
+  { id: 'sw3', title: 'Tiramisu', price: 6.25, originalPrice: 7.99, rating: 5, badge: 'Sale', emoji: '🍰', categoryId: 'sweets', description: 'Coffee-soaked ladyfingers with mascarpone' },
+  { id: 'sw4', title: 'Croissant', price: 3.50, rating: 4.5, emoji: '🥐', categoryId: 'sweets', description: 'Buttery flaky French pastry' },
+  { id: 'sw5', title: 'Brownie', price: 4.25, rating: 4.5, badge: 'New', emoji: '🍫', categoryId: 'sweets', description: 'Fudgy double chocolate brownie' },
+  { id: 'sw6', title: 'Cinnamon Roll', price: 4.50, rating: 5, emoji: '🥯', categoryId: 'sweets', description: 'Warm with cream cheese glaze' },
+];
+
+export const featuredProducts: Product[] = [
+  products[1],
+  products[10],
+  products[12],
+  products[18],
+];
+
+export const ourPicks: CartItem[] = [
+  { id: 'pick1', name: 'Cappuccino', price: 3.75, quantity: 0, image: '☕' },
+  { id: 'pick2', name: 'Cold Brew', price: 4.75, quantity: 0, image: '🧊' },
+  { id: 'pick3', name: 'Classic Mint Mojito', price: 5.50, quantity: 0, image: '🍹' },
+  { id: 'pick4', name: 'Chocolate Lava Cake', price: 6.50, quantity: 0, image: '🍰' },
 ];
 
 export interface OrderItem {
@@ -139,28 +95,32 @@ export interface OrderItem {
   product: Product;
   quantity: number;
   orderDate: string;
-  status: 'Delivered' | 'In Transit' | 'Preparing';
-  storeName: string;
+  status: 'Completed' | 'Preparing' | 'Ready';
 }
 
 export const recentOrders: OrderItem[] = [
-  { id: 'o1', product: products[0], quantity: 2, orderDate: 'Sep 8', status: 'Delivered', storeName: 'Tony Pizza Napoletana' },
-  { id: 'o2', product: products[3], quantity: 1, orderDate: 'Sep 7', status: 'Delivered', storeName: 'Smoothie Station' },
-  { id: 'o3', product: products[2], quantity: 3, orderDate: 'Sep 5', status: 'Delivered', storeName: 'Choco Lovers' },
-  { id: 'o4', product: products[1], quantity: 1, orderDate: 'Sep 3', status: 'Delivered', storeName: 'Green Bowl Co.' },
+  { id: 'o1', product: products[1], quantity: 2, orderDate: 'Sep 9', status: 'Completed', },
+  { id: 'o2', product: products[10], quantity: 1, orderDate: 'Sep 8', status: 'Completed', },
+  { id: 'o3', product: products[18], quantity: 1, orderDate: 'Sep 7', status: 'Completed', },
+  { id: 'o4', product: products[24], quantity: 2, orderDate: 'Sep 5', status: 'Completed', },
 ];
 
 export const activeOrder: {
-  storeName: string;
   arrivalTime: string;
   status: 'Preparing';
   items: { product: Product; quantity: number }[];
 } = {
-  storeName: 'Tony Pizza Napoletana',
-  arrivalTime: '9:45 PM',
+  arrivalTime: '9:35 AM',
   status: 'Preparing',
   items: [
-    { product: products[0], quantity: 1 },
-    { product: products[4], quantity: 1 },
+    { product: products[1], quantity: 1 },
+    { product: products[24], quantity: 1 },
   ],
 };
+
+export const rewardsProducts: Product[] = [
+  { id: 'rw1', title: 'Free Drink Voucher', price: 0, originalPrice: 6.50, rating: 5, badge: 'Reward', emoji: '🎁', categoryId: 'hot', description: 'Redeem with 100 points' },
+  { id: 'rw2', title: 'Free Pastry Voucher', price: 0, originalPrice: 5.95, rating: 5, badge: 'Reward', emoji: '🎁', categoryId: 'sweets', description: 'Redeem with 80 points' },
+  { id: 'rw3', title: 'Buy 1 Get 1 Coffee', price: 3.75, originalPrice: 7.50, rating: 5, badge: 'Reward', emoji: '☕', categoryId: 'hot', description: 'Redeem with 150 points' },
+  { id: 'rw4', title: 'Free Smoothie', price: 0, originalPrice: 6.25, rating: 5, badge: 'Reward', emoji: '🥤', categoryId: 'smoothie', description: 'Redeem with 120 points' },
+];
