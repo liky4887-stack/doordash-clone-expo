@@ -1,78 +1,104 @@
-/**
- * Orders Screen - Premium order tracking screen
- * Features: Design tokens integration, smooth animations, touchable feedback
- */
-
-import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import colors from "@/src/design-tokens/colors";
-import typography from "@/src/design-tokens/typography";
-import { space } from "@/src/design-tokens/spacing";
-import { shadows } from "@/src/design-tokens/shadows";
-import { borderRadius } from "@/src/design-tokens/border-radius";
-import { recentOrders, activeOrder } from '@/constants/mockData';
+import { Colors, Spacing, Radius } from '@/constants/colors';
+import { recentOrders, activeOrder, OrderItem } from '@/constants/mockData';
+import { useCartStore } from '@/store/useCartStore';
 import ProductCard from '@/components/ui/product-card';
 
 export default function OrdersScreen() {
-  const handleAddToCart = (product: any) => {
-    // Could re-add an order item to cart if needed
-  };
+  const addItem = useCartStore((state) => state.addItem);
+
+  const renderOrderItem = (item: OrderItem) => (
+    <View style={styles.orderCard}>
+      <ProductCard
+        badge={item.product.badge}
+        image={item.product.emoji}
+        originalPrice={item.product.originalPrice}
+        price={item.product.price}
+        rating={item.product.rating}
+        title={item.product.title}
+        onAddToCart={() =>
+          addItem({ id: item.product.id, name: item.product.title, price: item.product.price, image: item.product.emoji })
+        }
+      />
+      <View style={styles.orderMeta}>
+        <View style={styles.orderMetaLeft}>
+          <Text style={styles.orderStore} numberOfLines={1}>{item.storeName}</Text>
+          <Text style={styles.orderDate}>{item.orderDate} · Qty {item.quantity}</Text>
+        </View>
+        <View style={styles.statusBadge}>
+          <Text style={styles.statusText}>{item.status}</Text>
+        </View>
+      </View>
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <Animated.View entering={FadeInUp.duration(300).springify()}>
-          <Text style={styles.headerTitle}>Order History</Text>
-          <Text style={styles.headerSubtitle}>Your recent orders</Text>
-        </Animated.View>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Your Orders</Text>
+          <Text style={styles.headerSubtitle}>Track and reorder your favorites</Text>
+        </View>
 
-        {/* Active Order Card */}
-        <Animated.View entering={FadeInUp.delay(100).springify()} style={styles.activeOrderCard}>
-          <View style={styles.activeOrderHeader}>
-            <Text style={styles.activeOrderLabel}>Active Order</Text>
-            <View style={styles.statusBadgeActive}>
-              <Text style={styles.statusTextActive}>{activeOrder.status}</Text>
+        <View style={styles.activeOrderSection}>
+          <Text style={styles.sectionTitle}>Active Order</Text>
+          <View style={styles.activeOrderCard}>
+            <View style={styles.activeOrderHeader}>
+              <View style={styles.activeOrderIcon}>
+                <Ionicons name="restaurant-outline" size={22} color={Colors.WHITE} />
+              </View>
+              <View style={styles.activeOrderInfo}>
+                <Text style={styles.activeOrderStore}>{activeOrder.storeName}</Text>
+                <Text style={styles.activeOrderArrival}>Arriving by {activeOrder.arrivalTime}</Text>
+              </View>
+              <TouchableOpacity style={styles.trackBtn} activeOpacity={0.7}>
+                <Text style={styles.trackBtnText}>Track</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.progressContainer}>
+              <View style={styles.progressBar}>
+                <View style={styles.progressFill} />
+              </View>
+              <View style={styles.progressLabels}>
+                <Text style={styles.progressLabelActive}>Preparing</Text>
+                <Text style={styles.progressLabel}>On the way</Text>
+                <Text style={styles.progressLabel}>Delivered</Text>
+              </View>
+            </View>
+
+            <View style={styles.activeOrderItems}>
+              {activeOrder.items.map((item, index) => (
+                <View key={`active-${index}`} style={styles.activeItemRow}>
+                  <Text style={styles.activeItemEmoji}>{item.product.emoji}</Text>
+                  <Text style={styles.activeItemName} numberOfLines={1}>{item.product.title}</Text>
+                  <Text style={styles.activeItemQty}>x{item.quantity}</Text>
+                </View>
+              ))}
             </View>
           </View>
-          <Text style={styles.activeOrderStore}>{activeOrder.storeName}</Text>
-          <Text style={styles.activeOrderTime}>Estimated arrival: {activeOrder.arrivalTime}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.activeOrderProducts}>
-            {activeOrder.items.map((item) => (
-              <ProductCard
-                key={item.product.id}
-                image={item.product.emoji}
-                title={item.product.title}
-                price={item.product.price}
-                originalPrice={item.product.originalPrice}
-                rating={item.product.rating}
-                badge={item.product.badge}
-                onAddToCart={() => handleAddToCart(item.product)}
-              />
-            ))}
-          </ScrollView>
-        </Animated.View>
+        </View>
 
-        {/* Recent Orders Horizontal Scroll */}
-        <Animated.View entering={FadeInUp.delay(200).springify()} style={styles.recentOrdersSection}>
+        <View style={styles.recentSection}>
           <Text style={styles.sectionTitle}>Recent Orders</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {recentOrders.map((order) => (
-              <ProductCard
-                key={order.id}
-                image={order.product.emoji}
-                title={order.product.title}
-                price={order.product.price}
-                originalPrice={order.product.originalPrice}
-                rating={order.product.rating}
-                badge={order.product.badge}
-                onAddToCart={() => handleAddToCart(order.product)}
-              />
-            ))}
-          </ScrollView>
-        </Animated.View>
+          <Text style={styles.sectionSubtitle}>Tap to reorder in one click</Text>
+          <View style={styles.ordersGrid}>
+            {recentOrders.map((item, index) => {
+              if (index % 2 !== 0) return null;
+              const nextItem = recentOrders[index + 1];
+              return (
+                <View key={item.id} style={styles.ordersRow}>
+                  {renderOrderItem(item)}
+                  {nextItem ? renderOrderItem(nextItem) : <View style={styles.orderCardPlaceholder} />}
+                </View>
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={styles.bottomPadding} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -81,79 +107,188 @@ export default function OrdersScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background.primary,
+    backgroundColor: Colors.WHITE,
   },
   container: {
     flex: 1,
   },
+  header: {
+    paddingHorizontal: Spacing.LG,
+    paddingVertical: Spacing.MD,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.LIGHT_GRAY,
+  },
   headerTitle: {
-    fontSize: typography.fontSize['2xl'],
-    fontWeight: typography.fontWeight.bold,
-    color: colors.neutral[900],
-    paddingHorizontal: space.lg,
-    paddingTop: space.md,
+    fontSize: 22,
+    fontWeight: '700',
+    color: Colors.BLACK,
   },
   headerSubtitle: {
-    fontSize: typography.fontSize.base,
-    color: colors.neutral[500],
-    paddingHorizontal: space.lg,
-    paddingBottom: space.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.light,
+    fontSize: 14,
+    color: Colors.DARK_GRAY,
+    marginTop: 2,
+  },
+  activeOrderSection: {
+    paddingHorizontal: Spacing.LG,
+    paddingTop: Spacing.MD,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.BLACK,
+    marginBottom: Spacing.SM,
   },
   activeOrderCard: {
-    marginHorizontal: space.lg,
-    marginVertical: space.md,
-    padding: space.lg,
-    backgroundColor: colors.background.elevated,
-    borderRadius: borderRadius.xl,
-    ...shadows.md,
+    backgroundColor: Colors.GRAY,
+    borderRadius: Radius.LG,
+    padding: Spacing.MD,
+    marginBottom: Spacing.LG,
   },
   activeOrderHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: space.sm,
+    marginBottom: Spacing.MD,
   },
-  activeOrderLabel: {
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.bold,
-    color: colors.neutral[900],
+  activeOrderIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.BRAND,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  statusBadgeActive: {
-    backgroundColor: colors.AMBER + '20',
-    paddingHorizontal: space.sm,
-    paddingVertical: space.xs,
-    borderRadius: borderRadius.pill,
-  },
-  statusTextActive: {
-    fontSize: typography.fontSize.xs,
-    fontWeight: typography.fontWeight.bold,
-    color: colors.AMBER,
+  activeOrderInfo: {
+    flex: 1,
+    marginLeft: Spacing.MD,
   },
   activeOrderStore: {
-    fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.semibold,
-    color: colors.neutral[900],
-    marginBottom: 2,
+    fontSize: 15,
+    fontWeight: '700',
+    color: Colors.BLACK,
   },
-  activeOrderTime: {
-    fontSize: typography.fontSize.sm,
-    color: colors.neutral[500],
-    marginBottom: space.md,
+  activeOrderArrival: {
+    fontSize: 13,
+    color: Colors.DARK_GRAY,
+    marginTop: 2,
   },
-  activeOrderProducts: {
-    flexGrow: 0,
+  trackBtn: {
+    backgroundColor: Colors.BLACK,
+    paddingHorizontal: Spacing.MD,
+    paddingVertical: Spacing.SM,
+    borderRadius: Radius.CHIP,
   },
-  recentOrdersSection: {
-    paddingHorizontal: space.lg,
-    paddingBottom: space.lg,
+  trackBtnText: {
+    color: Colors.WHITE,
+    fontSize: 14,
+    fontWeight: '600',
   },
-  sectionTitle: {
-    fontSize: typography.fontSize.xl,
-    fontWeight: typography.fontWeight.bold,
-    color: colors.neutral[900],
-    marginBottom: space.md,
+  progressContainer: {
+    marginBottom: Spacing.MD,
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: Colors.LIGHT_GRAY,
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    width: '33%',
+    height: '100%',
+    backgroundColor: Colors.BRAND,
+    borderRadius: 2,
+  },
+  progressLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: Spacing.SM,
+  },
+  progressLabelActive: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: Colors.BRAND,
+  },
+  progressLabel: {
+    fontSize: 11,
+    color: Colors.DARK_GRAY,
+  },
+  activeOrderItems: {
+    borderTopWidth: 1,
+    borderTopColor: Colors.LIGHT_GRAY,
+    paddingTop: Spacing.SM,
+  },
+  activeItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 6,
+  },
+  activeItemEmoji: {
+    fontSize: 20,
+    marginRight: Spacing.SM,
+  },
+  activeItemName: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '500',
+    color: Colors.BLACK,
+  },
+  activeItemQty: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.DARK_GRAY,
+  },
+  recentSection: {
+    paddingTop: Spacing.MD,
+    paddingHorizontal: Spacing.LG,
+  },
+  sectionSubtitle: {
+    fontSize: 13,
+    color: Colors.DARK_GRAY,
+    marginBottom: Spacing.MD,
+  },
+  ordersGrid: {},
+  ordersRow: {
+    flexDirection: 'row',
+    gap: Spacing.SM,
+    marginBottom: Spacing.MD,
+  },
+  orderCard: {
+    flex: 1,
+  },
+  orderCardPlaceholder: {
+    flex: 1,
+  },
+  orderMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: Spacing.SM,
+    paddingHorizontal: 4,
+  },
+  orderMetaLeft: {
+    flex: 1,
+  },
+  orderStore: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.BLACK,
+  },
+  orderDate: {
+    fontSize: 11,
+    color: Colors.DARK_GRAY,
+    marginTop: 2,
+  },
+  statusBadge: {
+    backgroundColor: Colors.GREEN + '20',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  statusText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: Colors.GREEN,
+  },
+  bottomPadding: {
+    height: Spacing.XL * 2,
   },
 });
-

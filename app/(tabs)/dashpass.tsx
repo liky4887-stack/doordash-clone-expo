@@ -1,106 +1,100 @@
-/**
- * DashPass Screen - Premium subscription screen
- * Features: Design tokens integration, smooth animations, premium styling
- */
-
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-  FadeInUp,
-} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import colors from "@/src/design-tokens/colors";
-import typography from "@/src/design-tokens/typography";
-import { space } from "@/src/design-tokens/spacing";
-import { shadows } from "@/src/design-tokens/shadows";
-import { borderRadius } from "@/src/design-tokens/border-radius";
-import { dashpassProducts } from '@/constants/mockData';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Colors, Spacing, Radius } from '@/constants/colors';
+import { dashpassProducts, Product } from '@/constants/mockData';
+import { useCartStore } from '@/store/useCartStore';
+import LocationHeader from '@/components/LocationHeader';
+import SearchBar from '@/components/SearchBar';
 import ProductCard from '@/components/ui/product-card';
 
 export default function DashPassScreen() {
-  const handleAddToCart = (product: any) => {
-    // Could re-add a DashPass item to cart if needed
-  };
+  const addItem = useCartStore((state) => state.addItem);
+
+  const renderProduct = (item: Product) => (
+    <ProductCard
+      badge={item.badge}
+      image={item.emoji}
+      originalPrice={item.originalPrice}
+      price={item.price}
+      rating={item.rating}
+      title={item.title}
+      onAddToCart={() =>
+        addItem({ id: item.id, name: item.title, price: item.price, image: item.emoji })
+      }
+    />
+  );
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Hero with brand gradient + stats */}
-        <Animated.View entering={FadeInUp.duration(300).springify()} style={styles.heroSection}>
-          <View style={styles.heroBackground} />
-          <View style={styles.heroContent}>
-            <View style={styles.heroIcon}>
-              <Ionicons name="trophy" size={48} color={colors.primary[500]} />
-            </View>
-            <Text style={styles.heroTitle}>DashPass</Text>
-            <Text style={styles.heroSubtitle}>
-              Free delivery on orders over $12
-            </Text>
+        <LinearGradient
+          colors={['#1A1A1A', '#2D2D2D']}
+          style={styles.heroCard}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <View style={styles.heroBadge}>
+            <Ionicons name="trophy" size={20} color={Colors.YELLOW} />
+            <Text style={styles.heroBadgeText}>DASHPASS</Text>
+          </View>
 
-            <View style={styles.heroStats}>
-              <View style={styles.stat}>
-                <Text style={styles.statValue}>$0</Text>
-                <Text style={styles.statLabel}>Delivery fees</Text>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={styles.stat}>
-                <Text style={styles.statValue}>$1.99</Text>
-                <Text style={styles.statLabel}>Service fees</Text>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={styles.stat}>
-                <Text style={styles.statValue}>5%</Text>
-                <Text style={styles.statLabel}>Off pickup</Text>
-              </View>
-            </View>
+          <Text style={styles.heroTitle}>Save on every order</Text>
+          <Text style={styles.heroSubtitle}>
+            Get $0 delivery fees and reduced service fees on eligible orders over $12
+          </Text>
 
-            <TouchableOpacity
-              style={styles.ctaButton}
-              accessibilityRole="button"
-              accessibilityLabel="Start free trial"
-            >
-              <Text style={styles.ctaText}>Start Free Trial</Text>
+          <TouchableOpacity style={styles.heroBtn} activeOpacity={0.85}>
+            <Text style={styles.heroBtnText}>Try DashPass Free</Text>
+          </TouchableOpacity>
+
+          <View style={styles.heroStatsRow}>
+            <View style={styles.heroStat}>
+              <Text style={styles.heroStatValue}>$0</Text>
+              <Text style={styles.heroStatLabel}>Delivery fees</Text>
+            </View>
+            <View style={styles.heroStatDivider} />
+            <View style={styles.heroStat}>
+              <Text style={styles.heroStatValue}>10%</Text>
+              <Text style={styles.heroStatLabel}>Off orders</Text>
+            </View>
+            <View style={styles.heroStatDivider} />
+            <View style={styles.heroStat}>
+              <Text style={styles.heroStatValue}>5%</Text>
+              <Text style={styles.heroStatLabel}>Cash back</Text>
+            </View>
+          </View>
+        </LinearGradient>
+
+        <LocationHeader />
+        <SearchBar placeholder="Search DashPass stores" />
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>DashPass Exclusives</Text>
+            <TouchableOpacity activeOpacity={0.7}>
+              <Text style={styles.seeAll}>See all</Text>
             </TouchableOpacity>
           </View>
-        </Animated.View>
-
-        {/* DashPass Benefits */}
-        <Animated.View entering={FadeInUp.delay(200).springify()} style={styles.section}>
-          <Text style={styles.sectionTitle}>DashPass Benefits</Text>
-          <View style={styles.benefitsGrid}>
-            {[
-              { icon: 'car-sport-outline', title: 'Free Delivery', desc: 'On orders $12+' },
-              { icon: 'cash-outline', title: 'Lower Fees', desc: 'Reduced service fees' },
-              { icon: 'bag-handle-outline', title: 'Pickup Discount', desc: '5% off pickup orders' },
-              { icon: 'star-outline', title: 'Exclusive Deals', desc: 'DashPass-only offers' },
-            ].map((benefit, index) => (
-              <View key={index} style={styles.benefitCard}>
-                <Ionicons name={benefit.icon} size={24} color={colors.primary[500]} style={styles.benefitIcon} />
-                <Text style={styles.benefitTitle}>{benefit.title}</Text>
-                <Text style={styles.benefitDesc}>{benefit.desc}</Text>
-              </View>
-            ))}
+          <Text style={styles.sectionSubtitle}>
+            Member-only prices on top dishes
+          </Text>
+          <View style={styles.productGrid}>
+            {dashpassProducts.map((item, index) => {
+              if (index % 2 !== 0) return null;
+              const nextItem = dashpassProducts[index + 1];
+              return (
+                <View key={item.id} style={styles.productRow}>
+                  <View style={styles.productGridItem}>{renderProduct(item)}</View>
+                  <View style={styles.productGridItem}>{nextItem ? renderProduct(nextItem) : null}</View>
+                </View>
+              );
+            })}
           </View>
-        </Animated.View>
+        </View>
 
-        {/* DashPass Exclusive Products - 2-column grid */}
-        <Animated.View entering={FadeInUp.delay(300).springify()} style={styles.section}>
-          <Text style={styles.sectionTitle}>DashPass Exclusive Deals</Text>
-          <View style={styles.productsGrid}>
-            {dashpassProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                image={product.emoji}
-                title={product.title}
-                price={product.price}
-                originalPrice={product.originalPrice}
-                rating={product.rating}
-                badge={product.badge}
-                onAddToCart={() => handleAddToCart(product)}
-              />
-            ))}
-          </View>
-        </Animated.View>
+        <View style={styles.bottomPadding} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -109,137 +103,116 @@ export default function DashPassScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background.primary,
+    backgroundColor: Colors.WHITE,
   },
   container: {
     flex: 1,
   },
-  heroSection: {
-    position: 'relative',
-    marginHorizontal: space.lg,
-    marginTop: space.md,
-    marginBottom: space.xl,
-    borderRadius: borderRadius.xl,
+  heroCard: {
+    marginHorizontal: Spacing.LG,
+    marginTop: Spacing.MD,
+    borderRadius: Radius.LG,
+    padding: Spacing.XL,
     overflow: 'hidden',
-    ...shadows.lg,
   },
-  heroBackground: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: colors.primary[50],
-  },
-  heroContent: {
-    padding: space.xl,
+  heroBadge: {
+    flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: Spacing.MD,
   },
-  heroIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.primary[100],
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: space.lg,
+  heroBadgeText: {
+    color: Colors.YELLOW,
+    fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: 1,
+    marginLeft: Spacing.SM,
   },
   heroTitle: {
-    fontSize: typography.fontSize['3xl'],
-    fontWeight: typography.fontWeight.bold,
-    color: colors.neutral[900],
-    marginBottom: space.xs,
+    fontSize: 24,
+    fontWeight: '700',
+    color: Colors.WHITE,
+    marginBottom: 6,
   },
   heroSubtitle: {
-    fontSize: typography.fontSize.lg,
-    color: colors.neutral[600],
-    marginBottom: space.xl,
-    textAlign: 'center',
+    fontSize: 14,
+    color: '#CCCCCC',
+    lineHeight: 20,
+    marginBottom: Spacing.LG,
   },
-  heroStats: {
+  heroBtn: {
+    backgroundColor: Colors.BRAND,
+    paddingVertical: Spacing.MD,
+    borderRadius: Radius.CHIP,
+    alignItems: 'center',
+    marginBottom: Spacing.LG,
+  },
+  heroBtnText: {
+    color: Colors.WHITE,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  heroStatsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: space.xl,
-    paddingHorizontal: space.xl,
+    justifyContent: 'space-between',
   },
-  stat: {
+  heroStat: {
     flex: 1,
     alignItems: 'center',
   },
-  statValue: {
-    fontSize: typography.fontSize['2xl'],
-    fontWeight: typography.fontWeight.bold,
-    color: colors.primary[500],
+  heroStatValue: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: Colors.YELLOW,
   },
-  statLabel: {
-    fontSize: typography.fontSize.xs,
-    color: colors.neutral[500],
-    marginTop: space.xs,
+  heroStatLabel: {
+    fontSize: 12,
+    color: '#AAAAAA',
+    marginTop: 2,
   },
-  statDivider: {
+  heroStatDivider: {
     width: 1,
-    height: 40,
-    backgroundColor: colors.neutral[300],
-    marginHorizontal: space.xl,
-  },
-  ctaButton: {
-    backgroundColor: colors.primary[500],
-    paddingHorizontal: space.xl,
-    paddingVertical: space.md,
-    borderRadius: borderRadius.pill,
-    ...shadows.md,
-  },
-  ctaText: {
-    color: colors.background.inverse,
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.bold,
+    height: 30,
+    backgroundColor: '#333333',
   },
   section: {
-    paddingTop: space.md,
-    paddingBottom: space['2xl'],
+    paddingTop: Spacing.MD,
+    paddingBottom: Spacing.SM,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.LG,
   },
   sectionTitle: {
-    fontSize: typography.fontSize.xl,
-    fontWeight: typography.fontWeight.bold,
-    color: colors.neutral[900],
-    paddingHorizontal: space.lg,
-    marginBottom: space.md,
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.BLACK,
   },
-  benefitsGrid: {
+  seeAll: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.BRAND,
+  },
+  sectionSubtitle: {
+    fontSize: 13,
+    color: Colors.DARK_GRAY,
+    paddingHorizontal: Spacing.LG,
+    marginBottom: Spacing.MD,
+  },
+  productGrid: {
+    paddingHorizontal: Spacing.LG,
+  },
+  productRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: space.lg,
-    gap: space.md,
+    gap: Spacing.SM,
+    marginBottom: Spacing.MD,
   },
-  benefitCard: {
+  productGridItem: {
     flex: 1,
-    minWidth: 140,
-    backgroundColor: colors.background.primary,
-    borderRadius: borderRadius.lg,
-    padding: space.lg,
-    alignItems: 'center',
-    ...shadows.sm,
   },
-  benefitIcon: {
-    marginBottom: space.md,
-  },
-  benefitTitle: {
-    fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.bold,
-    color: colors.neutral[900],
-    textAlign: 'center',
-    marginBottom: space.xs,
-  },
-  benefitDesc: {
-    fontSize: typography.fontSize.sm,
-    color: colors.neutral[500],
-    textAlign: 'center',
-  },
-  productsGrid: {
-    paddingHorizontal: space.lg,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
+  bottomPadding: {
+    height: Spacing.XL * 2,
   },
 });
-
