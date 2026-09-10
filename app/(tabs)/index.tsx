@@ -223,12 +223,10 @@ const styles = StyleSheet.create({
   },
   featuredCard: {
     width: 160,
-    backgroundColor: 'rgba(255,248,240,0.72)',
+    backgroundColor: '#FFFFFF',
     borderRadius: Radius.CARD,
     padding: Spacing.MD,
     gap: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.55)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
@@ -273,9 +271,13 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
+    paddingBottom: 140,
   },
   productRow: {
     width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
   productGridItem: {
     width: '48.5%',
