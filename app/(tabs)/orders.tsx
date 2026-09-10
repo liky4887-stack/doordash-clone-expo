@@ -3,72 +3,75 @@
  * Features: Design tokens integration, smooth animations, touchable feedback
  */
 
-import { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, FlatList, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-  FadeInUp,
-} from 'react-native-reanimated';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from "@/src/design-tokens/colors";
 import typography from "@/src/design-tokens/typography";
+import { space } from "@/src/design-tokens/spacing";
 import { shadows } from "@/src/design-tokens/shadows";
-import { ourPicks } from '@/constants/mockData';
+import { borderRadius } from "@/src/design-tokens/border-radius";
+import { recentOrders, activeOrder } from '@/constants/mockData';
+import ProductCard from '@/components/ui/product-card';
 
 export default function OrdersScreen() {
-  const [orders, setOrders] = useState([
-    {
-      id: '1',
-      restaurant: 'Burger Place',
-      status: 'Preparing',
-      time: '30 min',
-      deliveryFee: '$3.50',
-    },
-    {
-      id: '2',
-      restaurant: 'Sushi Bar',
-      status: 'On the way',
-      time: '15 min',
-      deliveryFee: '$2.50',
-    },
-  ]);
+  const handleAddToCart = (product: any) => {
+    // Could re-add an order item to cart if needed
+  };
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Header */}
         <Animated.View entering={FadeInUp.duration(300).springify()}>
           <Text style={styles.headerTitle}>Order History</Text>
           <Text style={styles.headerSubtitle}>Your recent orders</Text>
         </Animated.View>
 
-        <Animated.View style={styles.ordersListSection} entering={FadeInUp.delay(100).springify()}>
-          {orders.map((order, index) => (
-            <TouchableOpacity
-              key={order.id}
-              style={styles.orderCard}
-              accessibilityRole="button"
-              accessibilityLabel={order.restaurant + ' order'}
-            >
-              <View style={styles.orderHeader}>
-                <Text style={styles.restaurantName}>{order.restaurant}</Text>
-                <Text style={styles.statusBadge}>{order.status}</Text>
-              </View>
-
-              <View style={styles.orderDetails}>
-                <Text style={styles.deliveryTime}>{order.time}</Text>
-                <Text style={styles.deliveryFee}>Delivery: {order.deliveryFee}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+        {/* Active Order Card */}
+        <Animated.View entering={FadeInUp.delay(100).springify()} style={styles.activeOrderCard}>
+          <View style={styles.activeOrderHeader}>
+            <Text style={styles.activeOrderLabel}>Active Order</Text>
+            <View style={styles.statusBadgeActive}>
+              <Text style={styles.statusTextActive}>{activeOrder.status}</Text>
+            </View>
+          </View>
+          <Text style={styles.activeOrderStore}>{activeOrder.storeName}</Text>
+          <Text style={styles.activeOrderTime}>Estimated arrival: {activeOrder.arrivalTime}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.activeOrderProducts}>
+            {activeOrder.items.map((item) => (
+              <ProductCard
+                key={item.product.id}
+                image={item.product.emoji}
+                title={item.product.title}
+                price={item.product.price}
+                originalPrice={item.product.originalPrice}
+                rating={item.product.rating}
+                badge={item.product.badge}
+                onAddToCart={() => handleAddToCart(item.product)}
+              />
+            ))}
+          </ScrollView>
         </Animated.View>
 
-        {/* Empty state */}
-        <Animated.View entering={FadeInUp.delay(200).springify()} style={styles.emptyState}>
-          <Ionicons name="list-outline" size={64} color={colors.neutral[300]} />
-          <Text style={styles.emptyTitle}>No orders yet</Text>
-          <Text style={styles.emptySubtitle}>
-            Start ordering to see your order history here
-          </Text>
+        {/* Recent Orders Horizontal Scroll */}
+        <Animated.View entering={FadeInUp.delay(200).springify()} style={styles.recentOrdersSection}>
+          <Text style={styles.sectionTitle}>Recent Orders</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {recentOrders.map((order) => (
+              <ProductCard
+                key={order.id}
+                image={order.product.emoji}
+                title={order.product.title}
+                price={order.product.price}
+                originalPrice={order.product.originalPrice}
+                rating={order.product.rating}
+                badge={order.product.badge}
+                onAddToCart={() => handleAddToCart(order.product)}
+              />
+            ))}
+          </ScrollView>
         </Animated.View>
       </ScrollView>
     </SafeAreaView>
@@ -98,66 +101,59 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border.light,
   },
-  ordersListSection: {
+  activeOrderCard: {
+    marginHorizontal: space.lg,
+    marginVertical: space.md,
+    padding: space.lg,
+    backgroundColor: colors.background.elevated,
+    borderRadius: borderRadius.xl,
+    ...shadows.md,
+  },
+  activeOrderHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: space.sm,
+  },
+  activeOrderLabel: {
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.neutral[900],
+  },
+  statusBadgeActive: {
+    backgroundColor: colors.AMBER + '20',
+    paddingHorizontal: space.sm,
+    paddingVertical: space.xs,
+    borderRadius: borderRadius.pill,
+  },
+  statusTextActive: {
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.AMBER,
+  },
+  activeOrderStore: {
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.semibold,
+    color: colors.neutral[900],
+    marginBottom: 2,
+  },
+  activeOrderTime: {
+    fontSize: typography.fontSize.sm,
+    color: colors.neutral[500],
+    marginBottom: space.md,
+  },
+  activeOrderProducts: {
+    flexGrow: 0,
+  },
+  recentOrdersSection: {
     paddingHorizontal: space.lg,
     paddingBottom: space.lg,
   },
-  orderCard: {
-    backgroundColor: colors.background.primary,
-    borderRadius: borderRadius.lg,
-    padding: space.lg,
-    marginBottom: space.lg,
-    ...shadows.sm,
-  },
-  orderHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: space.md,
-  },
-  restaurantName: {
-    fontSize: typography.fontSize.base,
-    fontWeight: typography.fontWeight.bold,
-    color: colors.neutral[900],
-  },
-  statusBadge: {
-    backgroundColor: colors.primary[100],
-    color: colors.primary[500],
-    paddingHorizontal: space.sm,
-    paddingVertical: space.xs,
-    borderRadius: borderRadius.sm,
-    fontSize: typography.fontSize.xs,
-    fontWeight: typography.fontWeight.bold,
-  },
-  orderDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  deliveryTime: {
-    fontSize: typography.fontSize.base,
-    color: colors.neutral[500],
-  },
-  deliveryFee: {
-    fontSize: typography.fontSize.sm,
-    color: colors.primary[500],
-    fontWeight: typography.fontWeight.medium,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: space.lg,
-  },
-  emptyTitle: {
+  sectionTitle: {
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.bold,
     color: colors.neutral[900],
-    marginBottom: space.sm,
-  },
-  emptySubtitle: {
-    fontSize: typography.fontSize.base,
-    color: colors.neutral[500],
-    textAlign: 'center',
-    maxWidth: 200,
+    marginBottom: space.md,
   },
 });
+

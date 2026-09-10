@@ -11,22 +11,22 @@ import Animated, {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import colors from "@/src/design-tokens/colors";
 import typography from "@/src/design-tokens/typography";
+import { space } from "@/src/design-tokens/spacing";
 import { shadows } from "@/src/design-tokens/shadows";
-import { stores } from '@/constants/mockData';
-import LocationHeader from '@/components/LocationHeader';
-import SearchBar from '@/components/SearchBar';
-import StoreCard from '@/components/StoreCard';
+import { borderRadius } from "@/src/design-tokens/border-radius";
+import { dashpassProducts } from '@/constants/mockData';
+import ProductCard from '@/components/ui/product-card';
 
 export default function DashPassScreen() {
+  const handleAddToCart = (product: any) => {
+    // Could re-add a DashPass item to cart if needed
+  };
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInUp.duration(300).springify()}>
-          <LocationHeader />
-          <SearchBar />
-        </Animated.View>
-
-        <Animated.View entering={FadeInUp.delay(100).springify()} style={styles.heroSection}>
+        {/* Hero with brand gradient + stats */}
+        <Animated.View entering={FadeInUp.duration(300).springify()} style={styles.heroSection}>
           <View style={styles.heroBackground} />
           <View style={styles.heroContent}>
             <View style={styles.heroIcon}>
@@ -34,17 +34,17 @@ export default function DashPassScreen() {
             </View>
             <Text style={styles.heroTitle}>DashPass</Text>
             <Text style={styles.heroSubtitle}>
-              Free delivery on orders over \$12
+              Free delivery on orders over $12
             </Text>
 
             <View style={styles.heroStats}>
               <View style={styles.stat}>
-                <Text style={styles.statValue}>\$0</Text>
+                <Text style={styles.statValue}>$0</Text>
                 <Text style={styles.statLabel}>Delivery fees</Text>
               </View>
               <View style={styles.statDivider} />
               <View style={styles.stat}>
-                <Text style={styles.statValue}>\$1.99</Text>
+                <Text style={styles.statValue}>$1.99</Text>
                 <Text style={styles.statLabel}>Service fees</Text>
               </View>
               <View style={styles.statDivider} />
@@ -64,11 +64,12 @@ export default function DashPassScreen() {
           </View>
         </Animated.View>
 
+        {/* DashPass Benefits */}
         <Animated.View entering={FadeInUp.delay(200).springify()} style={styles.section}>
           <Text style={styles.sectionTitle}>DashPass Benefits</Text>
           <View style={styles.benefitsGrid}>
             {[
-              { icon: 'car-sport-outline', title: 'Free Delivery', desc: 'On orders \$12+' },
+              { icon: 'car-sport-outline', title: 'Free Delivery', desc: 'On orders $12+' },
               { icon: 'cash-outline', title: 'Lower Fees', desc: 'Reduced service fees' },
               { icon: 'bag-handle-outline', title: 'Pickup Discount', desc: '5% off pickup orders' },
               { icon: 'star-outline', title: 'Exclusive Deals', desc: 'DashPass-only offers' },
@@ -82,11 +83,21 @@ export default function DashPassScreen() {
           </View>
         </Animated.View>
 
+        {/* DashPass Exclusive Products - 2-column grid */}
         <Animated.View entering={FadeInUp.delay(300).springify()} style={styles.section}>
-          <Text style={styles.sectionTitle}>Available Near You</Text>
-          <View style={styles.storesList}>
-            {stores.slice(0, 4).map((store) => (
-              <StoreCard key={store.id} store={store} />
+          <Text style={styles.sectionTitle}>DashPass Exclusive Deals</Text>
+          <View style={styles.productsGrid}>
+            {dashpassProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                image={product.emoji}
+                title={product.title}
+                price={product.price}
+                originalPrice={product.originalPrice}
+                rating={product.rating}
+                badge={product.badge}
+                onAddToCart={() => handleAddToCart(product)}
+              />
             ))}
           </View>
         </Animated.View>
@@ -224,7 +235,11 @@ const styles = StyleSheet.create({
     color: colors.neutral[500],
     textAlign: 'center',
   },
-  storesList: {
+  productsGrid: {
     paddingHorizontal: space.lg,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
   },
 });
+

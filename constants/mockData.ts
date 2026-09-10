@@ -56,6 +56,7 @@ export interface Product {
   originalPrice?: number;
   rating?: number;
   badge?: string;
+  image?: string;
   emoji: string;
 }
 
@@ -112,15 +113,19 @@ export const healthItems: HealthItem[] = [
 ];
 
 export const products: Product[] = [
-  { id: 'pr1', title: 'Margherita Pizza', price: 14.99, originalPrice: 22.99, rating: 4.5, badge: 'Sale', emoji: '🍕' },
-  { id: 'pr2', title: 'Vegan Buddha Bowl', price: 12.49, rating: 5, badge: 'New', emoji: '🥗' },
-  { id: 'pr3', title: 'Chocolate Lava Cake', price: 7.99, originalPrice: 11.99, rating: 4.5, badge: 'Sale', emoji: '🍫' },
-  { id: 'pr4', title: 'Strawberry Smoothie', price: 6.49, rating: 5, badge: 'New', emoji: '🥤' },
-  { id: 'pr5', title: 'Pepperoni Pizza', price: 16.99, originalPrice: 24.99, rating: 4.5, badge: 'Sale', emoji: '🍕' },
-  { id: 'pr6', title: 'Chicken Burrito', price: 10.99, rating: 4, badge: 'New', emoji: '🌯' },
-  { id: 'pr7', title: 'Avocado Toast', price: 8.49, originalPrice: 12.99, rating: 4.5, badge: 'Sale', emoji: '🥑' },
-  { id: 'pr8', title: 'Fresh Lemonade', price: 4.99, rating: 4, emoji: '🍋' },
+  { id: 'pr1', title: 'Margherita Pizza', price: 14.99, originalPrice: 22.99, rating: 4.5, badge: 'Sale', image: '🍕', emoji: '🍕' },
+  { id: 'pr2', title: 'Vegan Buddha Bowl', price: 12.49, rating: 5, badge: 'New', image: '🥗', emoji: '🥗' },
+  { id: 'pr3', title: 'Chocolate Lava Cake', price: 7.99, originalPrice: 11.99, rating: 4.5, badge: 'Sale', image: '🍫', emoji: '🍫' },
+  { id: 'pr4', title: 'Strawberry Smoothie', price: 6.49, rating: 5, badge: 'New', image: '🥤', emoji: '🥤' },
+  { id: 'pr5', title: 'Pepperoni Pizza', price: 16.99, originalPrice: 24.99, rating: 4.5, badge: 'Sale', image: '🍕', emoji: '🍕' },
+  { id: 'pr6', title: 'Chicken Burrito', price: 10.99, rating: 4, badge: 'New', image: '🌯', emoji: '🌯' },
+  { id: 'pr7', title: 'Avocado Toast', price: 8.49, originalPrice: 12.99, rating: 4.5, badge: 'Sale', image: '🥑', emoji: '🥑' },
+  { id: 'pr8', title: 'Fresh Lemonade', price: 4.99, rating: 4, image: '🍋', emoji: '🍋' },
+  // extra products per requirement (>=6 items, already have 8)
+  { id: 'pr9', title: 'Gourmet Burger', price: 13.99, originalPrice: 19.99, rating: 4, badge: 'Sale', image: '🍔', emoji: '🍔' },
+  { id: 'pr10', title: 'Pasta Alfredo', price: 11.99, rating: 4, badge: 'New', image: '🍝', emoji: '🍝' },
 ];
+;
 
 export const dashpassProducts: Product[] = [
   { id: 'dp1', title: 'Premium Pizza Combo', price: 18.99, originalPrice: 28.99, rating: 5, badge: 'DashPass', emoji: '🍕' },

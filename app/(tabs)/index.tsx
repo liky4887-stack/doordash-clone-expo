@@ -13,13 +13,12 @@ import typography from "@/src/design-tokens/typography";
 import { space } from "@/src/design-tokens/spacing";
 import { shadows } from "@/src/design-tokens/shadows";
 import { borderRadius } from "@/src/design-tokens/border-radius";
-import { categories, stores, deals } from '@/constants/mockData';
+import { categories, products } from '@/constants/mockData';
 import { useCartStore } from '@/store/useCartStore';
 import LocationHeader from '@/components/LocationHeader';
 import SearchBar from '@/components/SearchBar';
 import CategoryChip from '@/components/CategoryChip';
-import StoreCard from '@/components/StoreCard';
-import DealCard from '@/components/DealCard';
+import ProductCard from '@/components/ui/product-card';
 
 // Animated components from Reanimated
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
@@ -66,6 +65,15 @@ function ActionButton({ icon, label, active }: ActionButtonProps) {
 export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const addItem = useCartStore((state) => state.addItem);
+
+  const handleAddToCart = (product: any) => {
+    addItem({
+      id: product.id,
+      name: product.title,
+      price: product.price,
+      image: product.emoji,
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -118,48 +126,29 @@ export default function HomeScreen() {
           </Text>
         </Animated.View>
 
-        {/* Shop Groceries Section */}
+        {/* Shop Groceries Section - 2-column grid */}
         <Animated.View entering={FadeInUp.delay(300).springify()} style={styles.section}>
           <Text style={styles.sectionTitle}>Shop Groceries</Text>
-          <AnimatedFlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.storesList}
-            data={stores.slice(0, 4)}
+          <FlatList
+            numColumns={2}
+            data={products.slice(0, 8)}
             renderItem={({ item }) => (
-              <StoreCard
-                store={item}
-                onPress={() =>
-                  addItem({ id: item.id, name: item.name, price: 12.99, image: item.emoji })
-                }
+              <ProductCard
+                image={item.emoji}
+                title={item.title}
+                price={item.price}
+                originalPrice={item.originalPrice}
+                rating={item.rating}
+                badge={item.badge}
+                onAddToCart={() => handleAddToCart(item)}
               />
             )}
             keyExtractor={(item) => item.id}
-            ItemSeparatorComponent={() => <View style={{ width: space.sm }} />}
+            contentContainerStyle={styles.productsGrid}
           />
         </Animated.View>
 
-        {/* DashPass Exclusive Deals */}
-        <Animated.View entering={FadeInUp.delay(400).springify()} style={styles.section}>
-          <Text style={styles.sectionTitle}>DashPass Exclusive Deals</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {deals.map((deal) => (
-              <DealCard key={deal.id} deal={deal} />
-            ))}
-          </ScrollView>
-        </Animated.View>
-
-        {/* Easter Prep Section */}
-        <Animated.View entering={FadeInUp.delay(500).springify()} style={styles.section}>
-          <Text style={styles.sectionTitle}>Easter Prep 🐣</Text>
-          <View style={styles.storesList}>
-            {stores.slice(0, 2).map((store) => (
-              <StoreCard key={`easter-${store.id}`} store={store} />
-            ))}
-          </View>
-        </Animated.View>
-
-        {/* Bottom Banner - Full-width footer banner above tab bar */}
+        {/* Bottom Banner */}
         <Animated.View entering={FadeInUp.delay(600).springify()} style={styles.bottomBanner}>
           <View style={styles.bannerContent}>
             <Text style={styles.bannerTitle}>Get 5% off pickup orders</Text>
@@ -248,9 +237,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.lg,
     marginBottom: space.md,
   },
-  storesList: {
-    paddingHorizontal: space.lg,
-  },
   bottomBanner: {
     marginHorizontal: space.lg,
     marginBottom: space.lg,
@@ -290,4 +276,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
